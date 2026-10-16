@@ -1,0 +1,1 @@
+ALTER TABLE "engagements" ADD COLUMN "mode" text DEFAULT 'human' NOT NULL;

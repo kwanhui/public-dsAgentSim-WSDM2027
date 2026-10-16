@@ -1,0 +1,5 @@
+run,learner_or_agent_messages,persona_messages,persona_replies,gate_reactions,tokens_successful_calls,tokens_all_metered_calls,usd_successful_calls,usd_all_metered_calls,wall_clock_s,wall_clock_basis,failed_attempts,failed_attempts_s,interrupted_attempts,interrupted_attempts_s,hidden_facts_obtained,hidden_facts_verified,hidden_fact_messages,early_flags_on_reveal,early_flags_other
+H1,19,25,19,6,385344,385344,1.3343,1.3343,175.5,end to end (replay or learner; no analyst brackets),0,0,0,0,4,4,"2, 2, 9, 14",0,0
+A1,7,15,7,8,432764,432764,1.6371,1.6371,385.3,successful stage attempts,0,0,0,0,2,2,"2, 4",0,0
+A2,21,29,21,8,656714,656714,2.0228,2.0228,496.4,successful stage attempts,0,0,0,0,1,1,13,0,0
+exhibit,6,9,6,3,154679,154679,0.5446,0.5446,90.9,end to end (replay or learner; no analyst brackets),0,0,0,0,1,1,2,0,0

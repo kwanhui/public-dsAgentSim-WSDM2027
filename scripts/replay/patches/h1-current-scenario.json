@@ -1,0 +1,80 @@
+{
+  "format": "agenticpracticum-replay-patch",
+  "formatVersion": 1,
+  "fixture": "scripts/replay/fixtures/human-reference.json",
+  "fixtureEngagementId": "55fd9659-a076-4e90-bb72-d4ee87c227d1",
+  "scenario": "configs/scenarios/customer-churn.yaml",
+  "description": [
+    "Brings the six artifacts of the reference human run H1 in line with the current churn scenario, and corrects one arithmetic slip, for the round-5 regeneration of the showcase.",
+    "H1 was recorded before scenario commit ccb537a, which raised the quarterly budget from S$180,000 to S$540,000 (6,000 offers a month at S$30 is S$180,000 a month, so S$540,000 a quarter) and moved the mediation outage that removed about 4% of usage values from March to May.",
+    "The recorded modelling and final reports also cost a month of 6,000 offers at S$18,000, which is S$180,000 at S$30 an offer, and derive about S$72 per save from it (S$720 at 250 saves).",
+    "Nothing else changes: the analysis content (row counts, rates, model results, runbook) is kept as recorded.",
+    "Other scenario facts were checked against the recording and need no change: 480,000 postpaid subscribers, churn from 1.4% to 2.1%, about 6,000 offers a month, S$30 per offer, the 6-month save rule, prepaid out of scope, the churn label including involuntary disconnections, total_charges as text with blanks for new joiners, the June observation month with a monthly refresh, 8,170 rows with 170 repeated subscriber_ids, 635 blank total_charges and 327 rows without usage (the committed extract gives the same counts), the offer levers, and 300 calls a day across a team of four.",
+    "The 19 learner messages name no budget figure, no outage month and no offer cost total, so no entry targets a message."
+  ],
+  "entries": [
+    {
+      "stage": "formulation",
+      "artifact": "problem-statement",
+      "old": "that the S$180,000 quarterly retention budget is spent",
+      "new": "that the S$540,000 quarterly retention budget is spent",
+      "reason": "Scenario fact: the quarterly retention budget is S$540,000 (commit ccb537a); the recording used S$180,000."
+    },
+    {
+      "stage": "formulation",
+      "artifact": "problem-statement",
+      "old": "within the S$180,000 quarterly budget",
+      "new": "within the S$540,000 quarterly budget",
+      "reason": "Scenario fact: the quarterly retention budget is S$540,000 (commit ccb537a)."
+    },
+    {
+      "stage": "data-collection",
+      "artifact": "data-audit",
+      "old": "from the March mediation-system outage",
+      "new": "from the May mediation-system outage",
+      "reason": "Scenario fact: the mediation outage is in May (commit ccb537a); the data dictionary now says May."
+    },
+    {
+      "stage": "cleaning",
+      "artifact": "cleaning-report",
+      "old": "Missing usage from the March mediation outage",
+      "new": "Missing usage from the May mediation outage",
+      "reason": "Scenario fact: the mediation outage is in May (commit ccb537a)."
+    },
+    {
+      "stage": "modelling",
+      "artifact": "model-report",
+      "old": "At S$30 per offer that is S$18,000 a month of the S$60,000 monthly run rate;",
+      "new": "At S$30 per offer that is S$180,000 a month, the whole of the S$180,000 monthly run rate of the S$540,000 quarterly budget;",
+      "reason": "Arithmetic: 6,000 offers at S$30 is S$180,000, not S$18,000. Scenario fact: the monthly run rate follows from the S$540,000 quarterly budget (S$540,000 / 3 = S$180,000), not S$60,000."
+    },
+    {
+      "stage": "deployment",
+      "artifact": "final-report",
+      "old": "that the S$180,000 quarterly retention budget can be spent",
+      "new": "that the S$540,000 quarterly retention budget can be spent",
+      "reason": "Scenario fact: the quarterly retention budget is S$540,000 (commit ccb537a)."
+    },
+    {
+      "stage": "deployment",
+      "artifact": "final-report",
+      "old": "a full 6,000-offer month costs S$18,000 in offer spend",
+      "new": "a full 6,000-offer month costs S$180,000 in offer spend",
+      "reason": "Arithmetic: 6,000 offers at S$30 is S$180,000, not S$18,000."
+    },
+    {
+      "stage": "deployment",
+      "artifact": "final-report",
+      "old": "at roughly S$72 of offer cost per save",
+      "new": "at roughly S$720 of offer cost per save",
+      "reason": "Arithmetic: follows from the corrected monthly spend, S$180,000 / 250 saves = S$720 per save."
+    },
+    {
+      "stage": "deployment",
+      "artifact": "final-report",
+      "old": "(2) The March mediation outage left 4% of rows",
+      "new": "(2) The May mediation outage left 4% of rows",
+      "reason": "Scenario fact: the mediation outage is in May (commit ccb537a)."
+    }
+  ]
+}

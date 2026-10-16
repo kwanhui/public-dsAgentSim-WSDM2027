@@ -1,0 +1,16 @@
+run,mode,group,position,replies,audits,consistent,inconsistent,failed,audit_rate
+H1,human,exemplar,all,25,15,15,0,0,0.6
+H1,human,exemplar,first_two,6,6,6,0,0,1.0
+H1,human,exemplar,later,19,9,9,0,0,0.474
+A1,agent,paper,all,15,14,14,0,0,0.933
+A1,agent,paper,first_two,6,6,6,0,0,1.0
+A1,agent,paper,later,9,8,8,0,0,0.889
+A2,agent,paper,all,29,20,20,0,0,0.69
+A2,agent,paper,first_two,6,6,6,0,0,1.0
+A2,agent,paper,later,23,14,14,0,0,0.609
+exhibit,human,context,all,9,7,7,0,0,0.778
+exhibit,human,context,first_two,4,4,4,0,0,1.0
+exhibit,human,context,later,5,3,3,0,0,0.6
+"A1+A2 (paper-ready, pooled)",agent,paper,all,44,34,34,0,0,0.773
+"A1+A2 (paper-ready, pooled)",agent,paper,first_two,12,12,12,0,0,1.0
+"A1+A2 (paper-ready, pooled)",agent,paper,later,32,22,22,0,0,0.688

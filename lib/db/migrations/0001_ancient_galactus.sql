@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS "engagements_one_active_per_student" ON "engagements" USING btree ("student_id") WHERE status = 'active';

@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Next.js
+.next/
+out/
+build/
+dist/
+next-env.d.ts.bak
+
+# Production
+/build
+
+# Vercel
+.vercel
+.turbo
+
+# Vitest / Playwright
+coverage/
+playwright-report/
+test-results/
+
+# Environment: block every variant except the safe-to-commit example.
+.env
+.env.*
+!.env.example
+*.key
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Demo build artifacts (large videos, screencasts)
+demo/*.mp4
+demo/*.mov
+demo/*.gif
+!demo/.gitkeep
+
+# Paper screenshot outputs
+tests/e2e/paper-screenshots/
+demo/record/out/
+
+# Local demo database (PGlite)
+.pglite/
+# Scratch database for the baseline comparison (scripts/baseline/run-system.ts)
+.pglite-baseline/
+.env*
+
+# Baseline comparison outputs (copied into the paper repo when reported)
+results/

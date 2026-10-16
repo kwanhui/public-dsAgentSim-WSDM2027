@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the companion paper, which is under submission."
+title: "AgenticPracticum: A Multi-Agent LLM Testbed for Practising End-to-End Data-Science Engagements"
+type: software
+version: 0.1.0
+date-released: "2026-10-16"
+commit: "60d6e55c3da944726a33798050159ccb0dc54726"
+authors:
+  - family-names: Lim
+    given-names: Kwan Hui
+    orcid: "https://orcid.org/0000-0002-4569-0901"
+    affiliation: "Singapore University of Social Sciences, School of Business"
+  - family-names: Lee
+    given-names: Carmen Kar Hang
+    orcid: "https://orcid.org/0000-0001-8878-939X"
+    affiliation: "Singapore University of Social Sciences, School of Business"
+  - family-names: Liu
+    given-names: Vanessa
+    affiliation: "Singapore University of Social Sciences, School of Business"
+  - family-names: Zhu
+    given-names: Yongqing
+    affiliation: "Singapore University of Social Sciences, School of Science and Technology"
+keywords:
+  - data-science education
+  - large language models
+  - multi-agent systems
+  - simulated stakeholders
+  - authentic assessment
+license: MIT
+repository-code: "https://github.com/kwanhui/public-dsAgentSim-WSDM2027"
+url: "https://agenticpracticum.vercel.app"
+preferred-citation:
+  type: unpublished
+  title: "AgenticPracticum: A Multi-Agent LLM Testbed for Practising End-to-End Data-Science Engagements"
+  authors:
+    - family-names: Lim
+      given-names: Kwan Hui
+      orcid: "https://orcid.org/0000-0002-4569-0901"
+    - family-names: Lee
+      given-names: Carmen Kar Hang
+      orcid: "https://orcid.org/0000-0001-8878-939X"
+    - family-names: Liu
+      given-names: Vanessa
+    - family-names: Zhu
+      given-names: Yongqing
+  year: 2026
+  notes: "Submitted to the WSDM 2027 Demonstrations Track"

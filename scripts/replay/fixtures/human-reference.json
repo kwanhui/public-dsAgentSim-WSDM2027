@@ -1,0 +1,235 @@
+{
+  "format": "agenticpracticum-replay-fixture",
+  "formatVersion": 1,
+  "source": {
+    "snapshot": "demo/showcase-snapshot.json",
+    "snapshotExportedAt": "2026-09-02T09:44:56.690Z",
+    "cohortSlug": "showcase-meridian-mobile-churn-j51tl",
+    "engagementId": "55fd9659-a076-4e90-bb72-d4ee87c227d1",
+    "scenarioId": "customer-churn",
+    "learnerMessages": 19,
+    "submissions": 6
+  },
+  "timeline": [
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:06:06.515Z",
+      "stage": "formulation",
+      "personaId": "client",
+      "text": "Hi Sarah, thanks for bringing me in. Before I touch any data I want to make sure I understand the problem. When you say you need to fix churn, what decision do you actually want this work to support? Who acts on the output, and what would they do differently?",
+      "index": 0
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:06:19.327Z",
+      "stage": "formulation",
+      "personaId": "client",
+      "text": "That helps. What does a successful save look like from Finance's point of view? Is there a definition they hold you to? And how much does it cost to make one retention offer?",
+      "index": 1
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:06:29.167Z",
+      "stage": "formulation",
+      "personaId": "client",
+      "text": "How many offers can the retention team realistically make each month, and what budget do you have for the quarter? Also, is this postpaid only, or should prepaid subscribers be in scope too?",
+      "index": 2
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:06:40.870Z",
+      "stage": "formulation",
+      "personaId": "client",
+      "text": "Has anyone tried this before at Meridian? If there was a previous churn model or score, what happened to it, and what would make this one different for you?",
+      "index": 3
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:06:49.082Z",
+      "stage": "formulation",
+      "personaId": "client",
+      "text": "Last one for now: do you have any hunches about what drives churn here that I should check against the data? And by when do you need something the CFO can see?",
+      "index": 4
+    },
+    {
+      "kind": "submit",
+      "recordedAt": "2026-08-26T04:07:39.565Z",
+      "stage": "formulation",
+      "artifactKind": "problem-statement",
+      "attempt": 1,
+      "text": "Problem statement: targeted retention offers at Meridian Mobile\n\nBusiness objective. Meridian Mobile's postpaid churn has risen from 1.4% to 2.1% per month, and the CFO has asked Sarah Tan (VP Customer Retention) to show, within this quarter, that the S$180,000 quarterly retention budget is spent on the right subscribers instead of on every subscriber. The objective is to decide each month which postpaid subscribers the retention team should contact with an offer, so that the budget produces the most retained subscribers per dollar.\n\nThe decision and who makes it. The model supports a monthly targeting decision: from the postpaid base of roughly 480,000, produce a ranked call list of at most 6,000 subscribers for Priya's retention-campaign team, who execute the offers. Sarah owns the budget and signs off on the list size and offer mix; Priya's team acts on the list. The output must reach the campaign team in a form they can work from, with a reason attached to each name. Last year an agency delivered a PDF propensity ranking with no reasons, and the team stopped using it for that reason.\n\nPrediction target and unit of analysis. The unit of analysis is the individual postpaid subscriber. The target is the probability that a subscriber voluntarily leaves (ports out or cancels) within the coming observation window, so that an offer made now can still prevent the loss. How the warehouse defines the churn label (including whether involuntary disconnections are counted) is a data-collection question that I will confirm with Marcus Wong before modelling, since it changes what the model predicts.\n\nScope boundaries. Postpaid subscribers only; prepaid is outside Sarah's mandate. The engagement covers the targeting of retention offers. It does not cover changes to base plan pricing, and no subscriber data moves outside the agreed extract. Data access requires Marcus Wong's written scope agreement.\n\nOperational constraints. (1) Campaign capacity: about 6,000 offers per month is the team's ceiling regardless of list length. (2) Offer economics: about S$30 to serve one offer, within the S$180,000 quarterly budget. (3) Save definition: Finance counts a save only if the subscriber stays a further 6 months after the offer. (4) Timing: a first workable result is needed within weeks, this quarter.\n\nSuccess in business terms. Primary measure: saves per campaign dollar among contacted subscribers, using Finance's 6-month definition, compared with the current blanket approach. Secondary: the churn rate among contacted high-risk subscribers compared with similar subscribers who were not contacted, so that the CFO sees the effect of contacting someone, which raw model scores do not show. Model metrics (precision at the top 6,000, lift over random targeting) will be reported as engineering evidence, but the engagement succeeds only if the targeted list beats blanket spending in that comparison. Sarah's contract-end-date hunch will be tested against the data as a candidate driver before anyone relies on it.",
+      "index": 5
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:08:36.396Z",
+      "stage": "data-collection",
+      "personaId": "data-owner",
+      "text": "Hi Marcus, I'm the consultant working with Sarah Tan on retention targeting. Before asking for anything, here is the scope we agreed with Sarah: monthly targeting of retention offers to postpaid subscribers, capped at ~6,000 offers/month, list goes to Priya's campaign team. For that I need, at subscriber level and pseudonymised: subscriber attributes (tenure, contract type and end date, plan fee), usage (data, voice), billing (charges, payment method, late payments), and a churn label for postpaid subscribers. Purpose: train and validate a model that ranks subscribers by churn risk for the monthly call list. Can you release an extract on that basis?",
+      "index": 6
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:08:46.041Z",
+      "stage": "data-collection",
+      "personaId": "data-owner",
+      "text": "Thanks. Before I open it, how is the churn label defined in this extract? Does it include involuntary disconnections for non-payment, or only port-outs and cancellations?",
+      "index": 7
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:08:52.039Z",
+      "stage": "data-collection",
+      "personaId": "data-owner",
+      "text": "Good to know. What period does this extract cover? What is the observation month, and how recent is it relative to today? If I build a monthly call list from it, how stale would the scores be?",
+      "index": 8
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:09:00.372Z",
+      "stage": "data-collection",
+      "personaId": "data-owner",
+      "text": "Any known quirks I should expect when I load the file? Specifically: can the same subscriber_id appear more than once, are there columns stored in an odd type, and are there known gaps or missing values in any period?",
+      "index": 9
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:09:06.532Z",
+      "stage": "data-collection",
+      "personaId": "data-owner",
+      "text": "And what does tenure_months = 0 mean? Is that a data error or a real value? Also, to confirm PDPA compliance, there are no NRICs, names or contactable identifiers in the extract, right?",
+      "index": 10
+    },
+    {
+      "kind": "submit",
+      "recordedAt": "2026-08-26T04:11:38.529Z",
+      "stage": "data-collection",
+      "artifactKind": "data-audit",
+      "attempt": 1,
+      "text": "Data-collection memo\n\nRequested and received. I stated the agreed scope to Marcus Wong (subscriber-level, pseudonymised, postpaid only; attributes, usage, billing, churn label; purpose: train and validate a churn-risk ranking for the monthly retention call list). He released churn_extract.csv: 8,170 rows and 14 columns, with a pseudonymised subscriber_id as the only identifier. There are no NRICs, names or contactable identifiers, so the extract meets PDPA. Vintage: the extract reflects subscriber status as of the end of June and the warehouse refreshes it monthly, so scores built from one pull can be up to a month old before the next refresh.\n\nChurn label definition and concern. Marcus confirmed that churn=1 is a single combined flag covering port-outs, voluntary cancellations and involuntary disconnections for non-payment in the observation month, with no sub-code to split them. This affects our decision: a retention offer cannot save someone who is disconnected for non-payment, so involuntary churners add noise to the target for retention-offer targeting. At cleaning I will look at proxies (late_payments_12m, manual payment method) to estimate and reduce this, and I will report it as a label limitation.\n\nData-quality risks identified from the dictionary and from my questions to Marcus, checked against the file:\n1. Duplicate subscribers: subscriber_id is not unique, because mid-month plan changers appear twice. Checked: 170 ids appear exactly twice (8,170 rows, 8,000 unique subscribers), and the paired rows differ only in plan_monthly_fee, so a blind deduplication would keep arbitrary plan values.\n2. total_charges is stored as TEXT and is blank for subscribers who joined in the extract month. Checked: 635 blanks, matching the 635 tenure_months=0 rows. This agrees with Marcus's explanation that tenure_months=0 is a real value for a subscriber who joined during the extract month.\n3. Missing usage: data_usage_gb and voice_minutes are missing together in the same 327 rows (4.0%) from the March mediation-system outage; both are 3-month averages and share that caveat.\n4. The baseline churn rate is 3.21% in the raw extract, to be recomputed after the dedupe and label decisions.\n\nPlanned checks and actions. Dedupe on subscriber_id with an explicit keep rule (current plan row); cast total_charges to numeric and record how the new-joiner blanks are handled; analyse missingness for the outage rows and check it against churn before choosing an imputation; check that months_to_contract_end is 0 for all month-to-month rows.",
+      "index": 11
+    },
+    {
+      "kind": "submit",
+      "recordedAt": "2026-08-26T04:12:24.624Z",
+      "stage": "cleaning",
+      "artifactKind": "cleaning-report",
+      "attempt": 1,
+      "text": "Cleaning report: churn_extract.csv\n\nStarting point: 8,170 rows, 14 columns, raw churn rate 3.21% (262 churners).\n\n1. Duplicate subscribers (mid-month plan changers). 170 subscriber_id values appeared exactly twice. In every pair the two rows differ only in plan_monthly_fee and the churn label is the same, which confirms the warehouse quirk that Marcus described and rules out accidental double-loading. Action: deduplicated to one row per subscriber, keeping the later (post-change) plan row, since a retention offer would be made against the current plan. 170 rows removed; 8,000 unique subscribers remain. Reason: the unit of analysis in our problem statement is the subscriber, and counting plan changers twice would bias both the training weights and any per-subscriber ranking.\n\n2. total_charges stored as TEXT with blanks. Cast to numeric. All 628 remaining blanks correspond to tenure_months=0 new joiners, which the dictionary confirms are real values. Action: set total_charges to 0 for new joiners and added a new_joiner indicator, so that the model treats them as a separate group with no spending history. No rows dropped.\n\n3. Missing usage from the March mediation outage. After dedupe, 317 rows (4.0%) are missing data_usage_gb and voice_minutes together. Their churn rate is higher (4.4% against 3.2% overall), so the missingness cannot be ignored, and dropping these rows would bias the model. Action: median-imputed (30.9 GB, 301 minutes) with a usage_missing indicator; no rows dropped.\n\n4. Involuntary churners in the label. churn=1 includes non-payment disconnections, which retention offers cannot save. The extract has no sub-code, so I used a proxy: churners with late_payments_12m >= 3 (34 subscribers, 13.3% of churners) are likely involuntary. Action: kept them in the data with a likely_involuntary flag. The primary model will be trained with them excluded from the positive class, and a sensitivity run will include them. Reason: the problem statement says that the model targets saveable churn. I flagged this choice to Sarah as a label limitation in the data memo and will review it with her before handover.\n\nConsistency check: months_to_contract_end equals 0 for all 3,299 month-to-month rows, so the field is consistent.\n\nFinal analysis dataset: 8,000 rows, one per subscriber; the original 14 columns plus 3 engineered indicators (new_joiner, usage_missing, likely_involuntary); overall churn rate 3.20% (2.77% counting only saveable churners as positives). Every transformation is scripted and can be rerun from the raw extract, and the row counts at each step are logged for audit.",
+      "index": 12
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:15:11.164Z",
+      "stage": "modelling",
+      "personaId": "client",
+      "text": "Sarah, a quick progress update. Cleaning is done and documented. The first model results are in. With the campaign capacity of 6,000 offers a month (about 1.25% of the base), the model's top-ranked list catches would-be churners at roughly six times the rate of random targeting on held-out data. One caveat: that top-slice estimate rests on a small held-out sample, so I treat it as promising until we validate it on next month's extract. The main drivers so far are month-to-month status and contracts ending within 2 months, which supports your contract-end hunch. Short tenure, high plan fees, not being on autopay and network complaints also add to the risk. Are you comfortable with me validating this with Priya next?",
+      "index": 13
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:15:25.730Z",
+      "stage": "modelling",
+      "personaId": "client",
+      "text": "Before I take it to Priya, is there anything else on your mind about scope or the output while I'm still building?",
+      "index": 14
+    },
+    {
+      "kind": "submit",
+      "recordedAt": "2026-08-26T04:16:15.369Z",
+      "stage": "modelling",
+      "artifactKind": "model-report",
+      "attempt": 1,
+      "text": "Modelling report: retention-targeting model, first cut\n\nCandidate models. On the cleaned 8,000-subscriber dataset I compared (a) a contract-heuristic baseline (flag month-to-month subscribers and contracts ending within 2 months, the rule that Sarah's hunch implies) and (b) a class-weighted logistic regression on 15 features covering tenure, contract (month-to-month flag, months_to_contract_end, near-end indicator), plan_monthly_fee, total_charges, usage (data_usage_gb, voice_minutes), support_tickets_6m, network_complaints_6m, payment behaviour (late_payments_12m, manual payment flag, autopay), and the cleaning indicators (new_joiner, usage_missing). I kept the model simple on purpose: Priya's team needs a reason for each name, and a coefficient model translates directly into reason codes. A gradient-boosted model is a candidate for a second iteration once more months of data exist.\n\nTarget and leakage controls. The positive class is saveable churn: churn=1 excluding the 34 likely-involuntary churners (late_payments_12m >= 3), as in the cleaning report, which gives 222 positives (2.77%). Leakage controls: the extract has no post-outcome fields; total_charges is lifetime-to-date and is used with the new_joiner indicator; all features are attributes that a scoring run would know at the start of the month. The single-month extract cannot support a true temporal split, and this is the main validation limitation. I used a random 70/30 train/test split (5,600/2,400 subscribers; 161/61 positives), and I recommend an out-of-time validation on the July extract before full rollout.\n\nHeadline performance, with uncertainty. Held-out AUC is 0.682 (bootstrap 95% CI 0.619-0.740). The decision depends on performance at capacity: 6,000 offers against the 480,000 base is the top 1.25%, which is the top 30 rows of the 2,400-subscriber test set. There the model's precision is 16.7% (5 of 30) against a 2.54% base rate, roughly six times random targeting. I told Sarah in the channel that 30 rows is a small slice, so the top-slice estimate is promising and still unproven. The heuristic baseline tops out near the group churn rates (4.2% for month-to-month, 4.5% near contract end), so even a pessimistic reading beats both blanket spending and the simple rule. Both estimates need the out-of-time check before anything is promised to the CFO.\n\nOperating point. Chosen cutoff: the top 6,000 subscribers per month, which matches the ceiling of Priya's team. At S$30 per offer that is S$18,000 a month of the S$60,000 monthly run rate; the ranked list lets Sarah cut it at 4,000 or 5,000 if she wants slack for mid-month escalations.\n\nTop drivers in plain language. The two strongest signals are month-to-month status and a contract ending within 2 months, which confirms Sarah's hunch with numbers (near-end churn 4.5% against 2.0% mid-contract; month-to-month 4.2%). Next come short tenure (newer subscribers leave more), a high plan fee (price sensitivity), not being on autopay, and network complaints (subscribers with 2 or more complaints churn at 4.8%). Each list row will carry its dominant driver as a reason code (for example CONTRACT-END, PRICE or NETWORK) so that call scripts can match it.\n\nScope discipline. Mid-build, Sarah asked whether the model could also flag upsell candidates, passing on pressure from the CFO. I declined and gave her my reasons in the channel. A churn-risk ranking trained on saveable churn has no revenue-expansion label to learn from. Adding one would split the 6,000-call capacity across two conflicting objectives, and a mixed purpose is part of why the last agency's score went unused. We agreed to keep upsell out of scope and to note it as a possible follow-on engagement once the retention loop is proven.",
+      "index": 15
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:17:18.059Z",
+      "stage": "testing",
+      "personaId": "end-user",
+      "text": "Hi Priya, I'm the consultant working with Sarah on retention targeting. Before anything goes live I want your team's view of it. The plan: each month you would get a ranked list of at most 6,000 postpaid subscribers. Each row would carry the score and a reason code for why the subscriber is flagged: NETWORK for repeated network complaints, PRICE for a high plan fee, CONTRACT-END for a contract ending within 2 months. Does 6,000 a month fit how your team works, and what would you want on each row to make a call?",
+      "index": 16
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:17:33.591Z",
+      "stage": "testing",
+      "personaId": "end-user",
+      "text": "On reasons: how would your call script differ between a NETWORK flag and a CONTRACT-END flag? And what offers can you put on the table for each, so that I don't promise anything you can't deliver?",
+      "index": 17
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:17:48.329Z",
+      "stage": "testing",
+      "personaId": "end-user",
+      "text": "On freshness: the extract refreshes monthly, so scores would be recomputed each month and could be up to a month old between pulls. Is monthly fresh enough for your team, or do contract-end flags need something faster? I would also print the score date on every list so that reps know what they are working from.",
+      "index": 18
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:18:00.131Z",
+      "stage": "testing",
+      "personaId": "end-user",
+      "text": "Last one: the last agency's PDF ranking failed your team. What made it unusable, and what format fits your workflow: a CSV into your CRM, a shared sheet, or something else? And would you want the list split by reason code so that you can batch calls?",
+      "index": 19
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:18:46.472Z",
+      "stage": "testing",
+      "personaId": "data-owner",
+      "text": "Marcus, one operational question from Priya's team. The full model rescore will run monthly with your extract refresh, but the campaign team's worst failure is a recontract pitch to someone who has already renewed. Could you pull contract status (contract_type, months_to_contract_end, or a renewed-since flag) more often than the full extract, for example as a lightweight weekly contract-status check on just the subscribers on that month's call list?",
+      "index": 20
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:24:23.220Z",
+      "stage": "testing",
+      "personaId": "end-user",
+      "text": "On your three questions. First, delivery will be weekly batches of about 1,500 rather than one large list at the start of the month, so your team gets a steady flow. Second, rows will carry up to two reason codes (primary and secondary) with the evidence behind each tag: plan fee against the base average for PRICE, the actual contract end date for CONTRACT-END, complaint count and last-complaint date for NETWORK, and the score date on every row. Third, on freshness I asked Marcus. The full rescore stays monthly. A lightweight weekly contract-status re-check on the active call list is technically feasible, but Sarah needs to approve it as a scope change, and I am raising it with her now. Until it exists, the constraint goes into the handover document in writing: CONTRACT-END rows can be up to a month stale, so your agents should check contract status on screen before pitching. I am also taking your PRICE point to Sarah, because your toolkit can soften price pain but cannot fix it. Does that cover how your team works?",
+      "index": 21
+    },
+    {
+      "kind": "message",
+      "recordedAt": "2026-08-26T04:24:37.143Z",
+      "stage": "testing",
+      "personaId": "client",
+      "text": "Sarah, Priya's session raised a validation result and a scope request. First, she validated the list shape: 6,000 a month works if it is delivered as weekly batches of about 1,500, as a CSV into the CRM and dialler, sorted by reason code, with the evidence behind each tag and the score date on every row. Second, her biggest risk is recontract pitches to people who have already renewed, because contract status is refreshed only monthly. Marcus says that a lightweight weekly contract-status re-check on just the active call list is a smaller query, but he needs your sign-off on it as a scope change before he can take it to his side. I recommend approving it, because it addresses the failure that ended the last agency's list. Can I put it in the handover as agreed, pending Marcus's feasibility check? Priya also noted that her offer toolkit (loyalty discounts on recontracts, vouchers, data top-ups) can soften PRICE-driven churn but cannot fix plan pricing, so if PRICE flags dominate the monthly list, that becomes a pricing decision for you and is outside what the campaign can do.",
+      "index": 22
+    },
+    {
+      "kind": "submit",
+      "recordedAt": "2026-08-26T04:25:11.703Z",
+      "stage": "testing",
+      "artifactKind": "validation-memo",
+      "attempt": 1,
+      "text": "User-validation memo: session with Priya Nair\n\nWhat I showed her. The proposed monthly output: a ranked list of at most 6,000 postpaid subscribers with reason codes (NETWORK, PRICE, CONTRACT-END), the score, and the plain-language drivers behind each flag.\n\nConcerns Priya raised, and what changed.\n1. Delivery cadence. 6,000 names in one list at the start of the month would overload her team in the first week and leave it idle by the third. Change made: delivery is in weekly batches of about 1,500, a steady flow that matches the 275-300 calls a day her team can make.\n2. One reason code is not enough. Risks stack (month-to-month and network complaints), and an agent who leads with a discount on what is really a network complaint wastes the call. Change made: up to two reason codes per row (primary and secondary), plus the evidence behind each tag: plan fee against the base average for PRICE, the actual contract end date for CONTRACT-END, complaint count and last-complaint date for NETWORK.\n3. Score freshness and the contract-end trap. Her top risk is recontract pitches to subscribers who have already renewed, which is the failure that ended last year's agency PDF. Monthly rescoring is acceptable for NETWORK and PRICE but too slow for CONTRACT-END. Changes made: the score date is printed on every row, and the contract end date is on the row so that agents can weigh the time left against staleness. I also took her request to Marcus. A lightweight weekly contract-status re-check on the active call list is a smaller query but needs a scope change, which Sarah has now approved pending Marcus's feasibility check. Until it exists, the staleness constraint is recorded in writing in the handover, and agents are told to check contract status on screen before pitching.\n4. Offer reality check. Her levers are 10-20% loyalty discounts on 6-12 month recontracts, handset vouchers and data top-ups. She cannot change base plan pricing, so PRICE flags go beyond her toolkit. No model change: the gap was escalated to Sarah, who will take PRICE-driven churn to pricing and product if that group is large. PRICE stays a visible reason code so that its size can be measured. NETWORK calls open with service recovery (apology, troubleshooting, ops referral) and do not lead with a discount.\n5. Format. No PDF. A CSV that loads into the CRM and dialler, sortable and batchable by reason code so that agents run one call type per block, with the same column layout every week because her team builds habits around it.\n\nAgreed output spec. Weekly CSV batch of about 1,500 rows (6,000 a month cap), fixed column order: subscriber_id, score, score_date, primary_reason, secondary_reason (nullable), evidence fields (plan fee against average, contract_end_date, complaint count and recency), contract_type, tenure_months. Sorted by score within reason code. Full rescore monthly on the warehouse refresh; the weekly contract-status re-check will be set up once Marcus confirms feasibility. Priya's verdict: good to pilot.",
+      "index": 23
+    },
+    {
+      "kind": "submit",
+      "recordedAt": "2026-08-26T04:26:24.934Z",
+      "stage": "deployment",
+      "artifactKind": "final-report",
+      "attempt": 1,
+      "text": "Final handover report: retention targeting at Meridian Mobile\n\nExecutive summary (for Sarah Tan). The engagement set out to show the CFO that the S$180,000 quarterly retention budget can be spent on the right subscribers instead of on blanket offers. Delivered: a churn-risk ranking over the postpaid base that fills the full capacity of Priya's team, 6,000 offers a month, with the subscribers most likely to leave for saveable reasons. On held-out data the top slice of the list catches would-be churners at roughly six times the rate of random targeting (16.7% precision at the capacity cutoff against a 2.5% base rate; AUC 0.682, bootstrap 95% CI 0.619-0.740). In business terms, a full 6,000-offer month costs S$18,000 in offer spend and, at the observed precision, reaches about 1,000 subscribers who would otherwise leave, against roughly 150 under blanket selection. If one in four contacted would-be churners accepts an offer and stays the 6 months that Finance requires, that is about 250 saves a month at roughly S$72 of offer cost per save. I have given the same caveat in every conversation: these estimates come from a single June extract and a small top-slice sample, so they are promising and not yet proven. Even at half the observed precision, the targeted list still beats both blanket spending and the simple contract-end rule. The verification plan below is meant to confirm the numbers before anyone turns them into a budget commitment.\n\nThe delivered pipeline. Input: Marcus Wong's monthly churn_extract pull (subscriber attributes, usage, billing, churn label; pseudonymised, postpaid only, PDPA-compliant, scope agreed in writing; refreshed monthly and reflecting status at the close of the observation month). Processing, scripted and rerunnable with row counts logged at every step: dedupe mid-month plan changers on subscriber_id, keeping the post-change plan row (170 rows); cast total_charges from text, with a new_joiner indicator for the 628 extract-month joiners; median-impute the 317 outage-affected usage rows, with a usage_missing indicator; flag churners with 3 or more late payments as likely involuntary (34 subscribers, 13.3% of churners) and exclude them from the training positives, since a retention offer cannot save a non-payment disconnection. Model: class-weighted logistic regression on 15 features, retrained monthly, chosen because its coefficients translate directly into the reason codes that the campaign team needs. Output: weekly CSV batches of about 1,500 rows (6,000 a month cap) in a fixed column order that loads into the CRM and dialler. Monitoring: a monthly check of score-distribution drift, realised churn by score decile, and the precision of the previous month's list once labels arrive, with an alert if top-list precision falls below twice random for two months in a row. Ownership: Marcus runs the extract and owns lineage; the retention team runs scoring from the handover scripts; Sarah owns the quarterly go or no-go decision.\n\nCampaign-team runbook (agreed with Priya). Each row carries up to two reason codes with the evidence behind them: CONTRACT-END shows the actual contract end date, PRICE shows plan fee against the base average, and NETWORK shows complaint count and last-complaint date. Scripts and levers: CONTRACT-END calls go out ahead of expiry with a 10-20% loyalty discount on a 6-12 month recontract or a handset voucher. NETWORK calls open with service recovery (apology, troubleshooting, ops referral) and offer a data top-up or bill credit as goodwill, never a discount first. PRICE calls get the loyalty offer as a stopgap, on the understanding that the toolkit cannot fix plan pricing. Reps batch calls by reason code, one call type per block. The score date is printed on every row, and agents check contract status on screen before any recontract pitch, because scores can be up to a month stale between refreshes. Sarah has approved a weekly contract-status re-check on the active call list, pending Marcus's feasibility check. Until it runs, the staleness constraint stands in writing here so that nobody works around it quietly. The column layout is fixed from week to week.\n\nKnown limitations and risks. (1) Label pollution: churn=1 includes involuntary non-payment disconnections with no sub-code. Our late-payment proxy flagged 13.3% of churners as likely involuntary, but the proxy is imperfect and the warehouse should add a proper sub-code. (2) The March mediation outage left 4% of rows without usage data, and those rows churn at a higher rate (4.4% against 3.2%), so the imputation choice has a real effect on the model. (3) Single-month extract: no out-of-time validation was possible, seasonality cannot be seen, and the top-slice precision rests on 30 held-out rows. The July extract should be the first out-of-time test before full rollout. (4) PRICE-driven churn is beyond the campaign toolkit. If the PRICE group is large, that is a pricing and product decision for Sarah, and the reason code stays visible so that its size can be measured. (5) Discrimination is modest overall (AUC 0.682). The model is most useful at the top of the list, which is where the 6,000 offers go.\n\nWhat to measure over the next two quarters. Hold out a randomly selected 10% of each month's top-6,000 list as a no-contact control group. Compare 6-month retention between the contacted and control groups to measure realised saves per campaign dollar against the blanket-spend baseline; this is the number that the CFO should judge the work on. Rescore and validate out-of-time on each new monthly extract, and report precision at capacity with confidence intervals. Track offer acceptance and save rate by reason code so that the one-in-four assumption is replaced by a measurement. Set up the weekly contract-status re-check once Marcus confirms feasibility, and ask warehouse ops for the churn sub-code. Review at the end of two quarters. If the control-group comparison shows the targeted list beating blanket spending on saves per dollar, scaling up is justified. If it does not, my recommendation is to stop and rework the approach instead of continuing to spend. Upsell scoring stays out of scope as a follow-on engagement with its own outcome label, as agreed with Sarah.",
+      "index": 24
+    }
+  ],
+  "dataRequest": {
+    "personaId": "data-owner",
+    "maxAttempts": 2,
+    "text": "To state it fully: for the retention-targeting scope Sarah signed off, I need a pseudonymised extract at one row per postpaid subscriber, with tenure, contract type and months to contract end, plan fee, data and voice usage, total charges, payment method, late payments, autopay, and the churn label. Purpose: train and validate a model that ranks subscribers by churn risk for the monthly retention call list of about 6,000 offers. The data stays within this analysis. Can you release the extract on that basis?"
+  },
+  "expect": {},
+  "defaultApply": [],
+  "notes": [
+    "Reference human run H1 of the showcase cohort (rubric-v1, 104/105 when recorded).",
+    "The replay sends the recorded learner messages and artifacts, not the recorded persona replies; persona replies differ under the current prompts.",
+    "If the data owner has not released the extract after the recorded request, the replay sends dataRequest (purpose, fields, granularity) up to maxAttempts times, then stops.",
+    "The recording predates the current churn scenario (S$180,000 quarterly budget, March outage) and costs a month of 6,000 offers at S$18,000 (it is S$180,000). The replay applies scripts/replay/patches/h1-current-scenario.json by default, which updates those facts and fixes the arithmetic, and logs each replacement; --no-patch replays the recording verbatim. The patch replaces the substitution sets scenario-v2 and arithmetic that this fixture used to carry.",
+    "On 2026-10-07 the learner messages and artifacts were rewritten in plain prose (no dashes as punctuation, no \"honest caveat\" framing, no stock idioms) with every fact, figure, column name, question and stage decision kept, the same 19 messages and six artifacts, and the patch and probe anchors unchanged. The texts as recorded are in the git history of this file before that date."
+  ]
+}
