@@ -53,8 +53,9 @@ last section).
    through an invite in a private window, run one persona turn and one
    stage-gate submission, then archive the cohort.
 6. Showcase and sandbox: restore the showcase cohort with
-   `DB_DRIVER=direct pnpm showcase:restore --in demo/showcase-snapshot.json`
-   (the restore turns reviewer access on for it). Create a separate sandbox
+   `DB_DRIVER=direct npx tsx --env-file=.env.local scripts/showcase-snapshot.ts restore --in demo/showcase-snapshot.json`
+   (the restore turns reviewer access on for it; the script reads the
+   database variables from the `.env.local` pulled in step 4). Create a separate sandbox
    cohort, tick **Open join** under Configuration, and give the paper and the
    landing page its `/try/<slug>` link. Keep reviewer access off for the
    sandbox and for every course cohort.
@@ -105,7 +106,7 @@ last section).
 The database drivers are Vercel Postgres (Neon) and, for local use, PGlite;
 an on-premises Postgres needs a node-postgres driver path that is not in the
 code yet. Once that exists, the rest is standard: `pnpm build && pnpm start`
-behind a reverse proxy, with the `vercel.json` cron replaced by a system cron
+behind a reverse proxy with `AUTH_TRUST_HOST=true` (or `AUTH_URL`) set, and with the `vercel.json` cron replaced by a system cron
 calling `GET /api/cron/cleanup` with the `Authorization: Bearer $CRON_SECRET`
 header. Do not copy the `pnpm demo` settings to such a server: `DEMO_MODE`
 turns on fixed logins.

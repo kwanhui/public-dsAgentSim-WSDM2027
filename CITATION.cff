@@ -4,7 +4,7 @@ title: "AgenticPracticum: A Multi-Agent LLM Testbed for Practising End-to-End Da
 type: software
 version: 0.1.0
 date-released: "2026-10-16"
-commit: "60d6e55c3da944726a33798050159ccb0dc54726"
+commit: "4097af2d5e5a3d544e8ffcc5b6276e3e61f8f7d5"
 authors:
   - family-names: Lim
     given-names: Kwan Hui

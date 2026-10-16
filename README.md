@@ -1,7 +1,5 @@
 # AgenticPracticum
 
-Cut from tool commit 60d6e55 (tag wsdm2027-submission); showcase generated at 960485f.
-
 > **Status:** public snapshot of the system submitted to the WSDM 2027 Demonstrations Track (under review).
 >
 > **Demonstration video:** <https://youtu.be/vfHl-Ba-PZI> (2:48).
@@ -46,6 +44,15 @@ https://agenticpracticum.vercel.app/try/try-the-demo-aeme7, starts an
 engagement without an account. The sandbox allows five seats per
 network each day and 40 messages per seat, within a USD 2 daily budget.
 
+The hosted demo runs the code in this repository. Its `/api/health` reports
+version `7f0a17a`, a commit in the authors' development history whose
+application code is the same as the tagged snapshot here
+(`wsdm2027-submission`); the commits after the tag change documentation only,
+apart from one punctuation mark in a historical prompt text listed on
+`/admin/scenarios`. The scenarios, the showcase snapshot, the sandbox limits
+and the reviewer account all come from the files in this repository and the
+settings in [Run your own copy](#run-your-own-copy).
+
 ## Documentation
 
 - [docs/architecture.md](docs/architecture.md): components, data flow, agents,
@@ -56,102 +63,199 @@ network each day and 40 messages per seat, within a USD 2 daily budget.
 - [scripts/reviewer-path-check.md](scripts/reviewer-path-check.md): the
   checklist for the reviewer path.
 
-## Run the Demo (no setup)
+## Run your own copy
 
-Needs Node 20 or later and pnpm 9 or later. The section 5 pipeline also needs
-Python 3.
+This section takes a fresh clone to a running copy of the system, first on
+your own machine with the offline mock model and then on your own Vercel
+project with real models. The hosted demo at
+https://agenticpracticum.vercel.app was set up with the same steps.
+
+### 1. Prerequisites
+
+- Node.js 20 or later and pnpm 9 (`corepack enable` gives the pinned
+  pnpm 9.12.0).
+- Git. Python 3 only for `make section5`, and `openssl` (or any other
+  source of random hex) for the secrets below.
+- For a real deployment: a Vercel account, a Neon Postgres database (added
+  from the Vercel Marketplace), and an Anthropic or OpenAI API key.
 
 ```bash
 git clone https://github.com/kwanhui/public-dsAgentSim-WSDM2027.git
 cd public-dsAgentSim-WSDM2027
 pnpm install
-make demo    # embedded PGlite database + mock LLM; open http://localhost:3000
+pnpm typecheck && pnpm test   # optional checks
 ```
 
-Sign in at `/admin` with `admin` / `demo` (local demo only), create a cohort, generate a learner
-invite URL, and open it in a private window to walk an engagement as a
-learner. Demo mode needs no database, API key, or env file; persona replies
-are canned but drive the full loop (scoping, dataset release, stage gates,
-rubric scores). The login `reviewer` / `reviewer` gives the read-only
-reviewer view. Set `PORT` (default 3000) to run the demo on another port; sign-in follows it.
+### 2. Local demo in mock mode (no setup)
 
 ```bash
-make demo-showcase   # the same, with the curated showcase cohort restored
+make demo            # empty demo database; open http://localhost:3000
+make demo-showcase   # the same, with the showcase cohort of the paper restored
 ```
 
-`make demo-showcase` migrates the local PGlite database, restores
-`demo/showcase-snapshot.json` into it (replacing that cohort's rows each time
-and creating the `admin` user row the cohort needs), and starts the demo. Set
-`PGLITE_DIR` to keep it apart from the plain demo database.
+Both targets run without an env file, API key or database server. They apply
+the migrations to an embedded PGlite database under `.pglite/` (set
+`PGLITE_DIR` to use another directory), set `DEMO_MODE=1` and
+`LLM_PROVIDER=mock`, and start `next dev`. The mock provider returns canned
+persona replies and rubric scores, which still drive the full loop (scoping,
+data release, stage gates, scores) without any model call. Set `PORT` to use
+another port; sign-in follows it.
 
-## Full Setup (real LLM personas)
+`make demo-showcase` also restores `demo/showcase-snapshot.json`, the cohort
+`showcase-meridian-mobile-churn-esagd` that holds the runs H1, A1, A2 and the
+exhibit of the paper's Table 2. It replaces that cohort's rows on every run.
+
+Demo mode has fixed logins at `/admin`: `admin` / `demo` for the instructor
+and `reviewer` / `reviewer` for the read-only reviewer account. The reviewer
+sees the showcase cohort and nothing else. To try the "Try as a learner"
+link, sign in as `admin`, create a cohort, open its **Configuration** page,
+tick **Open join** in the Sandbox section and save; the landing page then
+shows **Try as a learner**, which links to `/try/<cohort-slug>`.
+
+`GET http://localhost:3000/api/health` answers with `"ok":true`,
+`"provider":"mock"` and `"demoMode":true`.
+
+### 3. Environment variables
+
+For anything other than the demo targets, copy the template and fill it in:
 
 ```bash
 cp .env.example .env.local
-pnpm change-admin-password   # prints an ADMIN_PASSWORD_HASH line for .env.local
-pnpm db:migrate
-pnpm dev
 ```
 
-Fill in `.env.local` before the first start. These variables are required on a
-deployment, and `/api/health` reports each one as missing until it is set:
+`.env.example` describes every variable. On a deployment these are required,
+and `/api/health` answers 503 until each is set:
 
-- `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY` with `LLM_PROVIDER=openai`).
-- `POSTGRES_URL` for a Postgres database such as Neon (see the local recipe
-  below for a database without a server).
-- `AUTH_SECRET`, generated with `openssl rand -hex 32`.
-- `PSEUDONYM_SALT`, at least 32 characters and not the placeholder from
-  `.env.example`; `openssl rand -hex 32` gives a valid value.
-- `ADMIN_PASSWORD_HASH`, from `pnpm change-admin-password`.
-- `CRON_SECRET`, generated the same way. Without it the daily retention purge
-  at `/api/cron/cleanup` refuses to run.
-- `LLM_DAILY_BUDGET_USD`, a plain number such as `5`. It caps the day's model
-  spend; empty means no limit, and sandbox joins are refused while it is empty
-  on a paid provider. `/api/health` reports a missing budget as a warning, not
-  as a failure, so check the `warnings` field before going live.
+| Variable | Value |
+| --- | --- |
+| `LLM_PROVIDER` | `anthropic` or `openai` (`mock` for offline tests) |
+| `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` | the key for that provider |
+| `POSTGRES_URL`, `POSTGRES_URL_NON_POOLING` | set by the Neon integration on Vercel |
+| `AUTH_SECRET` | `openssl rand -hex 32` |
+| `PSEUDONYM_SALT` | `openssl rand -hex 32` (at least 32 characters) |
+| `CRON_SECRET` | `openssl rand -hex 32`; authenticates the daily purge |
+| `ADMIN_PASSWORD_HASH` | from `pnpm change-admin-password` |
 
-On a deployment with the "Try as a learner" sandbox, also set `DEMO_CONTACT`
-(an email address or a URL). The privacy page and the sandbox notice show it
-as the contact for deletion requests; unset, they point visitors to the paper
-and this README.
+These are optional:
 
-The password must be at least 12 characters and is read from a prompt, never
-from the command line. `--reviewer` prints a `REVIEWER_PASSWORD_HASH` line for
-the read-only reviewer account instead, and `--vercel` sets the variable on the
-linked Vercel project's production environment (it does not deploy).
+| Variable | Effect |
+| --- | --- |
+| `LLM_DAILY_BUDGET_USD` | daily spend limit over all model calls; set it on every deployment with a paid provider (the sandbox refuses joins without it), and `/api/health` warns while it is empty |
+| `ADMIN_EMAIL` | the instructor's login name (default `admin`) |
+| `REVIEWER_USERNAME`, `REVIEWER_PASSWORD_HASH` | the read-only reviewer account (default name `reviewer`; off while the hash is empty) |
+| `SANDBOX_COHORT_SLUG` | which open cohort the landing page links to when more than one has open join |
+| `DEMO_CONTACT` | email address or URL shown to sandbox visitors for deletion requests |
+| `LLM_PERSONA_MODEL`, `LLM_RUBRIC_MODEL`, `LLM_ANALYST_MODEL` | model overrides; the Anthropic defaults are `claude-sonnet-5` for personas and the analyst agent and `claude-opus-4-8` for the judge and the auditor |
+| `RETENTION_DAYS` | log retention for the daily purge (default 180) |
+| `LLM_MAX_TOKENS_*` | output-token caps per call |
+| `AUTH_URL` | public origin; leave unset unless a proxy rewrites the host |
+| `AUTH_TRUST_HOST` | `true` when you serve `pnpm start` yourself outside Vercel (Vercel sets the equivalent itself) |
+| `NEXT_PUBLIC_PAPER_URL`, `NEXT_PUBLIC_VIDEO_URL` | optional links on the landing page |
 
-Leave `AUTH_URL` commented out unless the app runs behind a proxy that rewrites
-the host. Unset, the invite and resume links an instructor hands to learners
-follow the host the request came in on, so a tunnel, a LAN address, or a
-preview deployment produces links that work. Every other variable is described
-in `.env.example`.
+`DB_DRIVER=pglite` (with `PGLITE_DIR`) swaps Postgres for the embedded
+database and is meant for local use. Never set `DEMO_MODE` outside the demo
+targets: it turns on the fixed logins, and a Vercel build refuses it.
 
-### Local real-mode recipe (no Postgres server)
+The password hashes come from a prompt:
 
-To run the non-demo configuration on a laptop, use the embedded PGlite database
-instead of Postgres. Put these in `.env.local` beside the variables above:
+```bash
+pnpm change-admin-password              # prints ADMIN_PASSWORD_HASH=...
+pnpm change-admin-password --reviewer   # prints REVIEWER_PASSWORD_HASH=...
+```
+
+Passwords must have at least 12 characters. The printed line has every `$`
+escaped as `\$`, which `.env.local` needs; paste the unescaped hash into the
+Vercel dashboard, or add `--vercel` to set the variable on the linked Vercel
+project directly.
+
+### 4. Local run with real settings
+
+To test the deployment configuration on your machine without a Postgres
+server, add these lines to `.env.local` beside the variables above:
 
 ```bash
 DB_DRIVER=pglite
-PGLITE_DIR=.pglite-real          # any new directory
-LLM_PROVIDER=mock                # or anthropic with ANTHROPIC_API_KEY set
+PGLITE_DIR=.pglite-real
+LLM_PROVIDER=mock        # or anthropic with ANTHROPIC_API_KEY set
 ```
 
-Then run `PGLITE_DIR=.pglite-real npx tsx scripts/migrate-local.ts` in place of
-`pnpm db:migrate`, and `pnpm dev`. The fixed `admin` / `demo` login is not
-available in this mode; sign in with the password behind your
-`ADMIN_PASSWORD_HASH`. To test the demo logins beside a paid provider on your
-own machine, set `DEMO_MODE=1` and `ALLOW_DEMO_MODE_WITH_KEY=1`; never set
-either on a shared deployment, and `DEMO_MODE` is refused on Vercel.
+Then migrate, restore the showcase and start:
+
+```bash
+npx tsx --env-file=.env.local scripts/migrate-local.ts
+npx tsx --env-file=.env.local scripts/showcase-snapshot.ts restore --in demo/showcase-snapshot.json
+pnpm dev                 # or: pnpm build && AUTH_TRUST_HOST=true pnpm start
+```
+
+Sign in at `/admin` with the passwords behind your hashes. `/api/health`
+should report `"demoMode":false` with every check true.
+
+### 5. Deploy to your own Vercel project
+
+1. Fork or push this repository to your own GitHub account, then in Vercel
+   choose **Add New > Project** and import it. The framework preset is
+   Next.js and the defaults (`pnpm install`, `pnpm build`) need no change.
+   `vercel.json` pins the functions to the Singapore region (`sin1`); change
+   `regions` there if your users are elsewhere.
+2. In the project's **Storage** tab, add a Neon Postgres database from the
+   Marketplace and connect it to the project. This sets `POSTGRES_URL`,
+   `POSTGRES_URL_NON_POOLING` and the related variables.
+3. Under **Settings > Environment Variables**, set the required variables
+   from step 3 for Production (and Preview, if you use preview
+   deployments), plus `LLM_DAILY_BUDGET_USD` and, if you want them, the
+   reviewer hash and `DEMO_CONTACT`.
+4. Create the tables. From your clone, link the project and pull its
+   environment, then run the migrations against Neon:
+
+   ```bash
+   npx vercel link
+   npx vercel env pull .env.local --environment=production
+   pnpm db:migrate
+   ```
+
+   Run `pnpm db:migrate` again after any update that adds a file under
+   `lib/db/migrations/`.
+5. Load the showcase cohort (optional, but it is what the reviewer account
+   shows):
+
+   ```bash
+   DB_DRIVER=direct npx tsx --env-file=.env.local scripts/showcase-snapshot.ts restore --in demo/showcase-snapshot.json --dry-run
+   DB_DRIVER=direct npx tsx --env-file=.env.local scripts/showcase-snapshot.ts restore --in demo/showcase-snapshot.json
+   ```
+
+   `DB_DRIVER=direct` uses the direct connection string. The restore turns
+   reviewer access on for this cohort and creates the instructor row it
+   needs. Restoring again later puts the cohort back as committed.
+6. Deploy (push to the production branch, or **Redeploy** in the dashboard)
+   so the build picks up the variables. Then check
+   `https://<your-project>.vercel.app/api/health`: it should answer 200 with
+   `"ok":true`, `"demoMode":false` and `"budgetSet":true`.
+7. Sign in at `/admin` as the instructor (`ADMIN_EMAIL`, default `admin`).
+   Create a cohort for course use, or one for visitors: for the hosted demo's
+   "Try the demo" cohort, open **Configuration**, keep only the churn
+   scenario, keep the gates formative (the default), tick **Open join**, keep
+   the sandbox defaults (USD 2 a day, 40 messages a seat) and leave reviewer
+   access off. Its link is `/try/<cohort-slug>`, and the landing page shows
+   it as **Try as a learner**. The code limits sandbox joins to five a day
+   from one network.
+8. Cron: `vercel.json` registers one job, `GET /api/cron/cleanup` daily at
+   03:00 UTC, which applies the retention rules. Vercel calls it with
+   `Authorization: Bearer $CRON_SECRET`, so `CRON_SECRET` must be set; it
+   appears under **Settings > Cron Jobs** after the first production deploy,
+   and `/api/health` reports `lastPurgeAt` once it has run. To call it by
+   hand: `curl -H "Authorization: Bearer $CRON_SECRET" https://<your-project>.vercel.app/api/cron/cleanup`.
+
+[demo/deploy.md](demo/deploy.md) gives the same steps with more on cost
+controls and retention, and [demo/README.md](demo/README.md) describes the
+reviewer account and the sandbox in more detail.
 
 ### Checking a running instance
 
 `GET /api/health` is public and returns a boolean per required setting, the
-provider, whether a budget is set, and the deployed commit. It answers 200 only
-when the database and every required secret are in place, and 503 otherwise
-with the failing field in the body. No secret value is returned.
-
-For deployment steps on Vercel and Neon, see [demo/deploy.md](demo/deploy.md).
+provider, whether a budget is set, and the deployed commit (`version`, or the
+package version outside Vercel). It answers 200 only when the database and
+every required secret are in place, and 503 otherwise with the failing field
+in the body. No secret value is returned.
 
 ## Reproducing section 5 of the paper
 
@@ -204,8 +308,8 @@ same when the showcase is regenerated.
 - Walkthrough 2 (the reference run and an agent on the same scenario): the
   compare view with H1 beside A1, which is the pinned pair of the cohort. For
   an agent run the compare view and the monitor report active time, the sum
-  of the stage attempts that finished without a failure; A1 reads about 4.6
-  minutes, because its interrupted first formulation attempt is left out.
+  of the stage attempts that finished without a failure; A1 reads 6m 25s
+  (6.4 minutes in Table 2).
 - Walkthrough 3 (a submission addressed to the assessor): the run labelled
   `exhibit`, whose data-audit memo is flagged in a banner above the submission.
 
@@ -278,8 +382,9 @@ port 3000; against a demo on another port, set it, for example
 ## Contact and data deletion
 
 Questions about the software, and requests to delete a sandbox engagement on
-the hosted demo, go to the corresponding author named in the paper, or to the
-`DEMO_CONTACT` address shown on the demo's privacy page. Quote the learner id
+the hosted demo, go to Kwan Hui Lim (khlim@suss.edu.sg), the first author of
+the paper, or to the `DEMO_CONTACT` address if a deployment's privacy page
+shows one. Quote the learner id
 shown after "Signed in as" in the workspace header. Sandbox engagements are
 deleted automatically 30 days after the seat was created.
 

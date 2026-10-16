@@ -46,10 +46,10 @@ reviewer account). In the local demo the reviewer login is `reviewer` /
 Production carries a curated showcase cohort on the Meridian Mobile churn
 scenario, built so that the claims in the paper can be checked in a few
 minutes rather than taken on trust. The cohort table labels its runs as the
-paper names them (H1 for the human reference run, A1 and on for analyst-agent
+paper names them (H1 for the scripted reference run, A1 and on for analyst-agent
 runs, and the exhibit). After signing in with the reviewer account:
 
-- **Compare view.** A completed six-stage human run beside a completed
+- **Compare view.** The completed six-stage scripted reference run (H1) beside a completed
   six-stage analyst-agent run on the same scenario, the same models, and the
   same gate policy. The view is stage-aligned, one row per pipeline stage and
   one row per rubric criterion inside a gate, with a summary strip stating the
@@ -165,8 +165,8 @@ Before every submission, and again the week reviews open, walk
   transaction, so read the dry-run summary before pointing it at production.
 
   The showcase is `showcase-meridian-mobile-churn-esagd`, regenerated on 2026-10-07 and
-  committed as the snapshot (tool 142cebb). An earlier regeneration the same day
-  (`showcase-meridian-mobile-churn-1f4wn`, tool 46fc939) was discarded because three
+  committed as the snapshot (development commit 142cebb). An earlier regeneration the same day
+  (`showcase-meridian-mobile-churn-1f4wn`, development commit 46fc939) was discarded because three
   persona replies were delivered as raw JSON. It replaces
   `showcase-meridian-mobile-churn-gx3s8`, the showcase restored to production
   on 2026-09-30; the earlier showcase (`showcase-meridian-mobile-churn-j51tl`)
@@ -192,7 +192,7 @@ Before every submission, and again the week reviews open, walk
 `scripts/paper-metrics/paper-runs.env` names the runs in it that the paper
 reports. `make section5` recomputes the paper's section 5 figures from this
 file alone, and `make showcase-regen` rebuilds the cohort on a running server
-and exports a new snapshot (see the README). Restore it with `DB_DRIVER=direct pnpm showcase:restore --in demo/showcase-snapshot.json`
+and exports a new snapshot (see the README). Restore it with `DB_DRIVER=direct npx tsx --env-file=.env.local scripts/showcase-snapshot.ts restore --in demo/showcase-snapshot.json` (after `vercel env pull .env.local`)
 if a reviewer mutates the showcase during the review window. The committed copy carries no
 learner session rows and has the invite tokens redacted; mint new invites after a restore if
 learner links are needed. `DB_DRIVER=direct` makes operator scripts reach Neon over the direct
