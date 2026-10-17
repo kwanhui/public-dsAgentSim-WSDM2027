@@ -44,12 +44,13 @@ https://agenticpracticum.vercel.app/try/try-the-demo-aeme7, starts an
 engagement without an account. The sandbox allows five seats per
 network each day and 40 messages per seat, within a USD 2 daily budget.
 
-The hosted demo runs the code in this repository. Its `/api/health` reports
-version `7f0a17a`, a commit in the authors' development history whose
-application code is the same as the tagged snapshot here
-(`wsdm2027-submission`); the commits after the tag change documentation only,
-apart from one punctuation mark in a historical prompt text listed on
-`/admin/scenarios`. The scenarios, the showcase snapshot, the sandbox limits
+The hosted demo is built from the authors' private development repository,
+and its `/api/health` reports the commit it was built from. That commit has the
+same application code as this repository; the two differ only in
+documentation. The tagged snapshot here (`wsdm2027-submission`) is the code as
+submitted, and the commits after the tag change documentation only, apart from
+one punctuation mark in a historical prompt text listed on `/admin/scenarios`.
+The scenarios, the showcase snapshot, the sandbox limits
 and the reviewer account all come from the files in this repository and the
 settings in [Run your own copy](#run-your-own-copy).
 
