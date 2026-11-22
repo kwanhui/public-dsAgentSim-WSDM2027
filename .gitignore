@@ -56,7 +56,6 @@ tests/e2e/paper-screenshots/
 
 # Local PGlite databases (the demo's .pglite/ and any scratch directory)
 .pglite*/
-.env*
 
 # Local run outputs
 results/

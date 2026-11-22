@@ -70,6 +70,19 @@ last section).
 7. Optional full check:
    `PLAYWRIGHT_BASE_URL=https://<deployment> E2E_ADMIN_PASSWORD=... pnpm e2e tests/e2e/engagement-walkthrough.spec.ts`
 
+## Production deploys and rollbacks
+
+The hosted demo at https://agenticpracticum.vercel.app deploys to production
+only when the main branch of this repository is pushed: Vercel builds each
+push to main, and `/api/health` then reports that commit as `version`. Do not
+run `vercel --prod` from a local checkout: such a build is made from the files
+on that machine rather than from a pushed commit, so it may not match the
+published code. Each deployed commit is tagged here as `deployed-YYYY-MM-DD`
+(with `-2`, `-3` and so on for a second or third deploy on the same day).
+To roll back, promote (Instant Rollback) only a deployment that Vercel built
+from this repository's main branch, and check that its commit matches a
+`deployed-` tag.
+
 ## Cost controls
 
 - Personas run on `claude-sonnet-5`, the rubric judge on `claude-opus-4-8`;

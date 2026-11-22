@@ -5,7 +5,7 @@
   "description": "Multi-agent LLM platform that simulates clients, data environments, and end-users so learners practise the end-to-end data-science engagement.",
   "license": "MIT",
   "engines": {
-    "node": ">=20.0.0",
+    "node": "24.x",
     "pnpm": ">=9.0.0"
   },
   "packageManager": "pnpm@9.12.0",

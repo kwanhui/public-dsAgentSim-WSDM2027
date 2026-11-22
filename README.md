@@ -48,8 +48,12 @@ the sandbox cohort. The code default for that budget is USD 2 a day. Since
 stored configuration, because a thorough seat costs about USD 0.6 to 0.8 and
 USD 2 covered only two or three of them a day.
 
-The hosted demo is built from the main branch of this repository, and its
-`/api/health` reports the commit it runs.
+The hosted demo is built from the main branch of this repository.
+Its `/api/health` endpoint reports the commit that the live demo runs in the
+`version` field, and each deployed commit is tagged in this repository as
+`deployed-YYYY-MM-DD`, with a suffix `-2`, `-3` and so on when more than one
+commit is deployed on the same day. [demo/deploy.md](demo/deploy.md) gives the
+rules for production deploys and rollbacks.
 The scenarios, the showcase snapshot, the sandbox limits
 and the reviewer account all come from the files in this repository and the
 settings in [Run your own copy](#run-your-own-copy).
@@ -73,8 +77,9 @@ https://agenticpracticum.vercel.app was set up with the same steps.
 
 ### 1. Prerequisites
 
-- Node.js 20 or later and pnpm 9 (`corepack enable` gives the pinned
-  pnpm 9.12.0).
+- Node.js 24 and pnpm 9 (`corepack enable` gives the pinned pnpm 9.12.0).
+  `package.json` pins Node `24.x`, the version the hosted demo builds with on
+  Vercel; with another Node version pnpm prints an engine warning.
 - Git. Python 3 only for `make section5`, and `openssl` (or any other
   source of random hex) for the secrets below.
 - For a real deployment: a Vercel account, a Neon Postgres database (added
@@ -286,7 +291,7 @@ at which each hidden fact was obtained, early-disclosure flags, audits by
 trigger, latency pooled over all pinned runs, and the cost of the fixed calls
 (judge, gate reactions and their audits, and the audits of each persona's
 first two replies) with the remaining cost per learner message. Costs use the dated list prices in
-`lib/llm/prices.ts`. The pipeline needs Node 20, pnpm and Python 3; it
+`lib/llm/prices.ts`. The pipeline needs Node.js, pnpm and Python 3; it
 installs its pinned Python packages into a virtual environment under the
 output directory.
 
