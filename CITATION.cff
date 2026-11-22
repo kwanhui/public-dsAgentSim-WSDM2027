@@ -1,0 +1,55 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the companion paper."
+title: "AgenticPracticum: A Multi-Agent LLM Testbed for Practising End-to-End Data-Science Engagements"
+type: software
+version: 0.1.0
+date-released: "2026-11-22"
+authors:
+  - family-names: Lim
+    given-names: Kwan Hui
+    orcid: "https://orcid.org/0000-0002-4569-0901"
+    affiliation: "Singapore University of Social Sciences, School of Business"
+  - family-names: Lee
+    given-names: Carmen Kar Hang
+    orcid: "https://orcid.org/0000-0001-8878-939X"
+    affiliation: "Singapore University of Social Sciences, School of Business"
+  - family-names: Liu
+    given-names: Vanessa
+    affiliation: "Singapore University of Social Sciences, School of Business"
+  - family-names: Zhu
+    given-names: Yongqing
+    affiliation: "Singapore University of Social Sciences, School of Science and Technology"
+keywords:
+  - data-science education
+  - large language models
+  - multi-agent systems
+  - simulated stakeholders
+  - authentic assessment
+license: MIT
+repository-code: "https://github.com/kwanhui/public-dsAgentSim-WSDM2027"
+url: "https://agenticpracticum.vercel.app"
+preferred-citation:
+  type: conference-paper
+  title: "AgenticPracticum: A Multi-Agent LLM Testbed for Practising End-to-End Data-Science Engagements"
+  authors:
+    - family-names: Lim
+      given-names: Kwan Hui
+      orcid: "https://orcid.org/0000-0002-4569-0901"
+    - family-names: Lee
+      given-names: Carmen Kar Hang
+      orcid: "https://orcid.org/0000-0001-8878-939X"
+    - family-names: Liu
+      given-names: Vanessa
+    - family-names: Zhu
+      given-names: Yongqing
+  collection-title: "Proceedings of the Twentieth ACM International Conference on Web Search and Data Mining (WSDM '27)"
+  conference:
+    name: "The Twentieth ACM International Conference on Web Search and Data Mining"
+    city: "Hong Kong"
+    country: HK
+    date-start: "2027-02-15"
+    date-end: "2027-02-19"
+  publisher:
+    name: "Association for Computing Machinery"
+  year: 2027
+  notes: "Accepted to the WSDM 2027 Demonstrations Track (notified 2026-11-22). Page numbers and the DOI will be added after publication."

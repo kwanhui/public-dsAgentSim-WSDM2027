@@ -1,0 +1,5 @@
+run,judge_calls,judge_usd,gate_reactions,gate_reaction_usd,fixed_audits,fixed_audit_usd,fixed_usd,usd_all_metered_calls,learner_or_agent_messages,usd_per_message
+H1,6,0.4149,6,0.1547,12,0.2867,0.8564,1.3343,19,0.0252
+A1,8,0.5403,8,0.2484,14,0.3404,1.1291,1.6371,7,0.0726
+A2,8,0.6395,8,0.2063,14,0.3327,1.1785,2.0228,21,0.0402
+exhibit,3,0.1674,3,0.0881,7,0.1345,0.39,0.5446,6,0.0258

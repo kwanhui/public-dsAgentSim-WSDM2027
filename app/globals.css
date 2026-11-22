@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 210 40% 96%;
+    /* Darkened from 47% to 40% lightness: muted text now clears 4.5:1 on
+       every surface it lands on (white 6.1, muted 5.6, muted/40 5.9,
+       primary/15 5.0); tests/unit/contrast.test.ts checks the list. */
+    --muted-foreground: 215 19% 40%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    /* Error / warning foreground. Darkened from 51% to 44% (#dc2828 -> #c31d1d)
+       so 14px error text clears 4.5:1 on every surface it lands on: white 5.98,
+       muted 5.46, bg-flag/5 5.52, and the danger button's bg-flag/10 hover 5.05
+       (4.62 in the worst case, bg-flag/10 over a muted card). */
+    --flag: 0 74% 44%;
+    /* Chart series colors, CVD-validated against the light surface:
+       chart-main = magnitude / "completion" series, chart-alt = "start" series. */
+    --chart-main: #2563eb;
+    --chart-alt: #d97706;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 222 47% 9%;
+      --foreground: 210 40% 98%;
+      --primary: 217 91% 60%;
+      --primary-foreground: 222 47% 9%;
+      --muted: 217 33% 17%;
+      --muted-foreground: 215 20% 65%;
+      --accent: 217 33% 17%;
+      --accent-foreground: 210 40% 98%;
+      --border: 217 33% 22%;
+      --input: 217 33% 22%;
+      /* Lightened from 56% to 68% for the same reason in reverse: #e03e3e only
+         reached 4.35 on the dark page and 3.48 on a dark muted card. #f36868
+         gives 6.18 / 4.93, and 4.66 at its worst (bg-flag/5 over a muted card). */
+      --flag: 0 85% 68%;
+      /* Re-validated against the dark surface; amber passes both modes. */
+      --chart-main: #3b82f6;
+      --chart-alt: #d97706;
+    }
+  }
+
+  body {
+    @apply selection:bg-primary/20;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+
+  /* Default keyboard focus indicator (WCAG 2.4.7). This used to be a blanket
+     `*:focus-visible { outline: none }`, which stripped the native ring from
+     every element and only Button/Input/Textarea drew one back with
+     focus-visible:ring-2. Links, link-wrapped buttons, nav tabs, checkboxes and
+     native selects were left with no visible focus at all.
+
+     The selector list is wrapped in :where() so it carries zero specificity: any
+     component that draws its own indicator still wins with the Tailwind
+     `focus-visible:outline-none focus-visible:ring-2` pair it already has, so
+     nothing gets a doubled ring. Everything else inherits this outline. */
+  :where(
+      a[href],
+      area[href],
+      button,
+      input,
+      select,
+      textarea,
+      summary,
+      [role="button"],
+      [contenteditable],
+      [tabindex]:not([tabindex="-1"])
+    ):focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  /* Anchors are used as a plain wrapper around a <Button> in several places
+     ("+ New cohort", "Enter your workspace", "Instructor admin", the empty-state
+     actions). Focus lands on the anchor, but an inline anchor's box is a text
+     line box, not the button, so the outline would trace the wrong shape. Make
+     the wrapper adopt the button's box and corner radius. */
+  a:has(> button) {
+    display: inline-flex;
+    border-radius: 0.375rem;
+  }
+
+  /* Horizontal scrollers (the cohort tab strip) clip an outline drawn outside
+     the child's border box. Draw the indicator inside instead, so a focused tab
+     stays fully visible without the container scrolling to reveal it. */
+  :where(.overflow-x-auto, .overflow-auto, .overflow-hidden)
+    > :where(a[href], button, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline-offset: -2px;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 200ms ease-out;
+  }
+  .animate-slide-down {
+    animation: slideDown 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Respect a reduced-motion preference: neutralise the typewriter, fade, slide,
+   and spinner animations for motion-sensitive learners and assistive tech. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

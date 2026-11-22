@@ -1,0 +1,6 @@
+run,mode,group,persona_replies,prompt_tokens,completion_tokens,usd_total,usd_per_reply,prices
+H1,human,exemplar,19,176187,6502,0.417394,0.022,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok"
+A1,agent,paper,7,80240,3677,0.19725,0.0282,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok"
+A2,agent,paper,21,208996,7785,0.495842,0.0236,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok; analyst Haiku 4.5 $1/$5"
+exhibit,human,context,6,61454,3170,0.154608,0.0258,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok"
+"A1+A2 (paper-ready, pooled)",agent,paper,28,289236,11462,0.693092,0.0248,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok"

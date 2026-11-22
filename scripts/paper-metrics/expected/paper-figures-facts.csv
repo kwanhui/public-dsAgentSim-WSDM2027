@@ -1,0 +1,9 @@
+run,fact,persona,learner_message,persona_turn,verified,detection,early_on_reveal
+H1,offer-cost,client,2,2,True,reported,False
+H1,save-definition,client,2,2,True,reported,False
+H1,duplicate-rows,data-owner,9,4,True,reported,False
+H1,offer-levers,end-user,14,2,True,reported,False
+A1,offer-cost,client,2,2,True,reported,False
+A1,duplicate-rows,data-owner,4,2,True,reported,False
+A2,offer-levers,end-user,13,1,True,reported,False
+exhibit,save-definition,client,2,2,True,reported,False

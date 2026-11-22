@@ -1,0 +1,178 @@
+metric,run,mode,unit,n,mean,sd,median,min,max,ci95_lo,ci95_hi,note
+persona_reply_latency,H1,human,s,0,,,,,,,,analyst_step(message) -> next persona_turn; agent runs only
+consistency_audit_latency,H1,human,s,9,1.503,0.198,1.473,1.262,1.833,1.351,1.656,persona_turn -> immediately following persona_consistency
+rubric_scoring_latency,H1,human,s,6,9.119,1.835,9.102,7.128,12.181,7.193,11.046,submissions.created_at -> submission_scored event
+analyst_policy_latency,H1,human,s,0,,,,,,,,previous event -> analyst_step (view build + policy LLM call)
+analyst_stage_wallclock,H1,human,s,0,,,,,,,,analyst_stage_started -> analyst_stage_finished; 0 empty bracket(s) excluded
+stage_dwell_time,H1,human,s,6,29.257,12.846,29.674,13.696,50.716,15.773,42.741,stage entry -> stage exit (stage_advanced boundaries); includes learner think time (human) / operator click latency (agent)
+engagement_wallclock,H1,human,s,1,175.542,,175.542,175.542,175.542,,,first event -> engagement_completed
+tokens_persona_prompt,H1,human,tok,19,9273.0,,,,,,,engagement total 176187
+tokens_persona_completion,H1,human,tok,19,342.2,,,,,,,engagement total 6502
+tokens_judge_prompt,H1,human,tok,6,10513.2,,,,,,,engagement total 63079
+tokens_judge_completion,H1,human,tok,6,663.5,,,,,,,engagement total 3981
+tokens_analyst_policy_prompt,H1,human,tok,0,,,,,,,,engagement total 0
+tokens_analyst_policy_completion,H1,human,tok,0,,,,,,,,engagement total 0
+tokens_consistency_audit_prompt,H1,human,tok,15,4322.1,,,,,,,engagement total 64831
+tokens_consistency_audit_completion,H1,human,tok,15,61.7,,,,,,,engagement total 926
+tokens_client_reaction_prompt,H1,human,tok,6,11326.7,,,,,,,engagement total 67960
+tokens_client_reaction_completion,H1,human,tok,6,313.0,,,,,,,engagement total 1878
+tokens_total_prompt,H1,human,tok,1,372057.0,,372057.0,372057.0,372057.0,,,6 stages reached
+tokens_total_completion,H1,human,tok,1,13287.0,,13287.0,13287.0,13287.0,,,
+tokens_total,H1,human,tok,1,385344.0,,385344.0,385344.0,385344.0,,,fully metered
+tokens_per_stage,H1,human,tok,1,64224.0,,64224.0,64224.0,64224.0,,,total / 6 stages
+llm_calls_total,H1,human,calls,1,46.0,,46.0,46.0,46.0,,,persona + judge + analyst policy + audit + reaction
+cost_usd_list,H1,human,USD,1,1.3343,,1.3343,1.3343,1.3343,,,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok"
+cost_usd_per_stage_list,H1,human,USD,1,0.2224,,0.2224,0.2224,0.2224,,,
+unmetered_llm_calls,H1,human,calls,1,0.0,,0.0,0.0,0.0,,,audits/reactions that recorded no usage; 0 once every call is metered
+persona_turns,H1,human,turns,1,19.0,,19.0,19.0,19.0,,,
+consistency_audits,H1,human,audits,1,15.0,,15.0,15.0,15.0,,,guaranteed-first-two in force
+audit_rate,H1,human,ratio,1,0.789,,0.789,0.789,0.789,,,15/19; cohort rate 0.25; guaranteed-first-two in force
+audits_consistent,H1,human,audits,1,15.0,,15.0,15.0,15.0,,,
+audits_inconsistent,H1,human,audits,1,0.0,,0.0,0.0,0.0,,,
+audits_failed,H1,human,audits,1,0.0,,0.0,0.0,0.0,,,
+rubric_total_score,H1,human,pts,1,100.0,,100.0,100.0,100.0,,,last attempt per stage; out of 105
+rubric_max_score,H1,human,pts,1,105.0,,105.0,105.0,105.0,,,6 stages scored
+rubric_ratio,H1,human,ratio,1,0.9524,,0.9524,0.9524,0.9524,,,
+rubric_stage_formulation,H1,human,pts,1,19.0,,19.0,19.0,20.0,,,19/20; attempts 1; passed=True
+rubric_stage_data-collection,H1,human,pts,1,15.0,,15.0,15.0,15.0,,,15/15; attempts 1; passed=True
+rubric_stage_cleaning,H1,human,pts,1,14.0,,14.0,14.0,15.0,,,14/15; attempts 1; passed=True
+rubric_stage_modelling,H1,human,pts,1,17.0,,17.0,17.0,20.0,,,17/20; attempts 1; passed=True
+rubric_stage_testing,H1,human,pts,1,15.0,,15.0,15.0,15.0,,,15/15; attempts 1; passed=True
+rubric_stage_deployment,H1,human,pts,1,20.0,,20.0,20.0,20.0,,,20/20; attempts 1; passed=True
+persona_reply_latency,A1,agent,s,7,6.143,1.974,6.088,3.158,9.775,4.317,7.968,analyst_step(message) -> next persona_turn; agent runs only
+consistency_audit_latency,A1,agent,s,6,1.566,0.07,1.566,1.448,1.643,1.493,1.64,persona_turn -> immediately following persona_consistency
+rubric_scoring_latency,A1,agent,s,8,10.847,2.992,10.278,7.515,16.999,8.346,13.349,submissions.created_at -> submission_scored event
+analyst_policy_latency,A1,agent,s,15,12.969,8.403,13.753,4.089,28.901,8.315,17.622,previous event -> analyst_step (view build + policy LLM call)
+analyst_stage_wallclock,A1,agent,s,6,64.217,44.477,47.785,34.982,153.506,17.534,110.9,analyst_stage_started -> analyst_stage_finished; 0 empty bracket(s) excluded
+stage_dwell_time,A1,agent,s,6,67.598,44.198,50.258,37.624,156.13,21.207,113.989,stage entry -> stage exit (stage_advanced boundaries); includes learner think time (human) / operator click latency (agent)
+engagement_wallclock,A1,agent,s,1,405.589,,405.589,405.589,405.589,,,first event -> engagement_completed
+tokens_persona_prompt,A1,agent,tok,7,11462.9,,,,,,,engagement total 80240
+tokens_persona_completion,A1,agent,tok,7,525.3,,,,,,,engagement total 3677
+tokens_judge_prompt,A1,agent,tok,8,9984.4,,,,,,,engagement total 79875
+tokens_judge_completion,A1,agent,tok,8,704.9,,,,,,,engagement total 5639
+tokens_analyst_policy_prompt,A1,agent,tok,15,4585.9,,,,,,,engagement total 68788
+tokens_analyst_policy_completion,A1,agent,tok,15,1154.5,,,,,,,engagement total 17317
+tokens_consistency_audit_prompt,A1,agent,tok,14,4542.4,,,,,,,engagement total 63593
+tokens_consistency_audit_completion,A1,agent,tok,14,64.0,,,,,,,engagement total 896
+tokens_client_reaction_prompt,A1,agent,tok,8,13733.9,,,,,,,engagement total 109871
+tokens_client_reaction_completion,A1,agent,tok,8,358.5,,,,,,,engagement total 2868
+tokens_total_prompt,A1,agent,tok,1,402367.0,,402367.0,402367.0,402367.0,,,6 stages reached
+tokens_total_completion,A1,agent,tok,1,30397.0,,30397.0,30397.0,30397.0,,,
+tokens_total,A1,agent,tok,1,432764.0,,432764.0,432764.0,432764.0,,,fully metered
+tokens_per_stage,A1,agent,tok,1,72127.3,,72127.3,72127.3,72127.3,,,total / 6 stages
+llm_calls_total,A1,agent,calls,1,52.0,,52.0,52.0,52.0,,,persona + judge + analyst policy + audit + reaction
+cost_usd_list,A1,agent,USD,1,1.6371,,1.6371,1.6371,1.6371,,,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok"
+cost_usd_per_stage_list,A1,agent,USD,1,0.2729,,0.2729,0.2729,0.2729,,,
+unmetered_llm_calls,A1,agent,calls,1,0.0,,0.0,0.0,0.0,,,audits/reactions that recorded no usage; 0 once every call is metered
+persona_turns,A1,agent,turns,1,7.0,,7.0,7.0,7.0,,,
+consistency_audits,A1,agent,audits,1,14.0,,14.0,14.0,14.0,,,guaranteed-first-two in force
+audit_rate,A1,agent,ratio,1,2.0,,2.0,2.0,2.0,,,14/7; cohort rate 0.25; guaranteed-first-two in force
+audits_consistent,A1,agent,audits,1,14.0,,14.0,14.0,14.0,,,
+audits_inconsistent,A1,agent,audits,1,0.0,,0.0,0.0,0.0,,,
+audits_failed,A1,agent,audits,1,0.0,,0.0,0.0,0.0,,,
+rubric_total_score,A1,agent,pts,1,84.0,,84.0,84.0,84.0,,,last attempt per stage; out of 105
+rubric_max_score,A1,agent,pts,1,105.0,,105.0,105.0,105.0,,,6 stages scored
+rubric_ratio,A1,agent,ratio,1,0.8,,0.8,0.8,0.8,,,
+rubric_stage_formulation,A1,agent,pts,1,19.0,,19.0,19.0,20.0,,,19/20; attempts 1; passed=True
+rubric_stage_data-collection,A1,agent,pts,1,14.0,,14.0,14.0,15.0,,,14/15; attempts 1; passed=True
+rubric_stage_cleaning,A1,agent,pts,1,12.0,,12.0,12.0,15.0,,,12/15; attempts 1; passed=True
+rubric_stage_modelling,A1,agent,pts,1,11.0,,11.0,11.0,20.0,,,11/20; attempts 3; passed=False
+rubric_stage_testing,A1,agent,pts,1,12.0,,12.0,12.0,15.0,,,12/15; attempts 1; passed=True
+rubric_stage_deployment,A1,agent,pts,1,16.0,,16.0,16.0,20.0,,,16/20; attempts 1; passed=True
+persona_reply_latency,A2,agent,s,21,4.704,1.705,5.045,2.436,8.46,3.928,5.48,analyst_step(message) -> next persona_turn; agent runs only
+consistency_audit_latency,A2,agent,s,11,1.46,0.272,1.38,1.214,2.172,1.277,1.642,persona_turn -> immediately following persona_consistency
+rubric_scoring_latency,A2,agent,s,8,10.488,1.999,10.684,7.66,12.871,8.817,12.16,submissions.created_at -> submission_scored event
+analyst_policy_latency,A2,agent,s,29,8.617,9.105,4.286,3.347,42.506,5.155,12.08,previous event -> analyst_step (view build + policy LLM call)
+analyst_stage_wallclock,A2,agent,s,6,82.725,24.486,71.291,63.859,126.237,57.025,108.425,analyst_stage_started -> analyst_stage_finished; 0 empty bracket(s) excluded
+stage_dwell_time,A2,agent,s,6,86.66,25.789,76.572,59.932,131.281,59.591,113.729,stage entry -> stage exit (stage_advanced boundaries); includes learner think time (human) / operator click latency (agent)
+engagement_wallclock,A2,agent,s,1,519.959,,519.959,519.959,519.959,,,first event -> engagement_completed
+tokens_persona_prompt,A2,agent,tok,21,9952.2,,,,,,,engagement total 208996
+tokens_persona_completion,A2,agent,tok,21,370.7,,,,,,,engagement total 7785
+tokens_judge_prompt,A2,agent,tok,8,12476.2,,,,,,,engagement total 99810
+tokens_judge_completion,A2,agent,tok,8,702.1,,,,,,,engagement total 5617
+tokens_analyst_policy_prompt,A2,agent,tok,29,4726.9,,,,,,,engagement total 137079
+tokens_analyst_policy_completion,A2,agent,tok,29,635.1,,,,,,,engagement total 18419
+tokens_consistency_audit_prompt,A2,agent,tok,20,4216.1,,,,,,,engagement total 84323
+tokens_consistency_audit_completion,A2,agent,tok,20,60.8,,,,,,,engagement total 1216
+tokens_client_reaction_prompt,A2,agent,tok,8,11381.8,,,,,,,engagement total 91054
+tokens_client_reaction_completion,A2,agent,tok,8,301.9,,,,,,,engagement total 2415
+tokens_total_prompt,A2,agent,tok,1,621262.0,,621262.0,621262.0,621262.0,,,6 stages reached
+tokens_total_completion,A2,agent,tok,1,35452.0,,35452.0,35452.0,35452.0,,,
+tokens_total,A2,agent,tok,1,656714.0,,656714.0,656714.0,656714.0,,,fully metered
+tokens_per_stage,A2,agent,tok,1,109452.3,,109452.3,109452.3,109452.3,,,total / 6 stages
+llm_calls_total,A2,agent,calls,1,86.0,,86.0,86.0,86.0,,,persona + judge + analyst policy + audit + reaction
+cost_usd_list,A2,agent,USD,1,2.0228,,2.0228,2.0228,2.0228,,,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok; analyst Haiku 4.5 $1/$5"
+cost_usd_per_stage_list,A2,agent,USD,1,0.3371,,0.3371,0.3371,0.3371,,,
+unmetered_llm_calls,A2,agent,calls,1,0.0,,0.0,0.0,0.0,,,audits/reactions that recorded no usage; 0 once every call is metered
+persona_turns,A2,agent,turns,1,21.0,,21.0,21.0,21.0,,,
+consistency_audits,A2,agent,audits,1,20.0,,20.0,20.0,20.0,,,guaranteed-first-two in force
+audit_rate,A2,agent,ratio,1,0.952,,0.952,0.952,0.952,,,20/21; cohort rate 0.25; guaranteed-first-two in force
+audits_consistent,A2,agent,audits,1,20.0,,20.0,20.0,20.0,,,
+audits_inconsistent,A2,agent,audits,1,0.0,,0.0,0.0,0.0,,,
+audits_failed,A2,agent,audits,1,0.0,,0.0,0.0,0.0,,,
+rubric_total_score,A2,agent,pts,1,87.0,,87.0,87.0,87.0,,,last attempt per stage; out of 105
+rubric_max_score,A2,agent,pts,1,105.0,,105.0,105.0,105.0,,,6 stages scored
+rubric_ratio,A2,agent,ratio,1,0.8286,,0.8286,0.8286,0.8286,,,
+rubric_stage_formulation,A2,agent,pts,1,18.0,,18.0,18.0,20.0,,,18/20; attempts 1; passed=True
+rubric_stage_data-collection,A2,agent,pts,1,12.0,,12.0,12.0,15.0,,,12/15; attempts 2; passed=True
+rubric_stage_cleaning,A2,agent,pts,1,14.0,,14.0,14.0,15.0,,,14/15; attempts 1; passed=True
+rubric_stage_modelling,A2,agent,pts,1,15.0,,15.0,15.0,20.0,,,15/20; attempts 2; passed=True
+rubric_stage_testing,A2,agent,pts,1,15.0,,15.0,15.0,15.0,,,15/15; attempts 1; passed=True
+rubric_stage_deployment,A2,agent,pts,1,13.0,,13.0,13.0,20.0,,,13/20; attempts 1; passed=True
+persona_reply_latency,exhibit,human,s,0,,,,,,,,analyst_step(message) -> next persona_turn; agent runs only
+consistency_audit_latency,exhibit,human,s,4,1.532,0.141,1.538,1.358,1.693,1.307,1.756,persona_turn -> immediately following persona_consistency
+rubric_scoring_latency,exhibit,human,s,3,8.989,2.886,7.554,7.102,12.311,1.82,16.158,submissions.created_at -> submission_scored event
+analyst_policy_latency,exhibit,human,s,0,,,,,,,,previous event -> analyst_step (view build + policy LLM call)
+analyst_stage_wallclock,exhibit,human,s,0,,,,,,,,analyst_stage_started -> analyst_stage_finished; 0 empty bracket(s) excluded
+stage_dwell_time,exhibit,human,s,2,42.151,12.241,42.151,33.495,50.807,,,stage entry -> stage exit (stage_advanced boundaries); includes learner think time (human) / operator click latency (agent)
+engagement_wallclock,exhibit,human,s,1,90.937,,90.937,90.937,90.937,,,first event -> engagement_completed (INCOMPLETE: last event used)
+tokens_persona_prompt,exhibit,human,tok,6,10242.3,,,,,,,engagement total 61454
+tokens_persona_completion,exhibit,human,tok,6,528.3,,,,,,,engagement total 3170
+tokens_judge_prompt,exhibit,human,tok,3,7824.7,,,,,,,engagement total 23474
+tokens_judge_completion,exhibit,human,tok,3,667.3,,,,,,,engagement total 2002
+tokens_analyst_policy_prompt,exhibit,human,tok,0,,,,,,,,engagement total 0
+tokens_analyst_policy_completion,exhibit,human,tok,0,,,,,,,,engagement total 0
+tokens_consistency_audit_prompt,exhibit,human,tok,7,3513.1,,,,,,,engagement total 24592
+tokens_consistency_audit_completion,exhibit,human,tok,7,66.0,,,,,,,engagement total 462
+tokens_client_reaction_prompt,exhibit,human,tok,3,12798.0,,,,,,,engagement total 38394
+tokens_client_reaction_completion,exhibit,human,tok,3,377.0,,,,,,,engagement total 1131
+tokens_total_prompt,exhibit,human,tok,1,147914.0,,147914.0,147914.0,147914.0,,,3 stages reached
+tokens_total_completion,exhibit,human,tok,1,6765.0,,6765.0,6765.0,6765.0,,,
+tokens_total,exhibit,human,tok,1,154679.0,,154679.0,154679.0,154679.0,,,fully metered
+tokens_per_stage,exhibit,human,tok,1,51559.7,,51559.7,51559.7,51559.7,,,total / 3 stages
+llm_calls_total,exhibit,human,calls,1,19.0,,19.0,19.0,19.0,,,persona + judge + analyst policy + audit + reaction
+cost_usd_list,exhibit,human,USD,1,0.5446,,0.5446,0.5446,0.5446,,,"Sonnet 5 $2/$10, Opus 4.8 $5/$25 per MTok"
+cost_usd_per_stage_list,exhibit,human,USD,1,0.1815,,0.1815,0.1815,0.1815,,,
+unmetered_llm_calls,exhibit,human,calls,1,0.0,,0.0,0.0,0.0,,,audits/reactions that recorded no usage; 0 once every call is metered
+persona_turns,exhibit,human,turns,1,6.0,,6.0,6.0,6.0,,,
+consistency_audits,exhibit,human,audits,1,7.0,,7.0,7.0,7.0,,,guaranteed-first-two in force
+audit_rate,exhibit,human,ratio,1,1.167,,1.167,1.167,1.167,,,7/6; cohort rate 0.25; guaranteed-first-two in force
+audits_consistent,exhibit,human,audits,1,7.0,,7.0,7.0,7.0,,,
+audits_inconsistent,exhibit,human,audits,1,0.0,,0.0,0.0,0.0,,,
+audits_failed,exhibit,human,audits,1,0.0,,0.0,0.0,0.0,,,
+rubric_total_score,exhibit,human,pts,1,34.0,,34.0,34.0,34.0,,,last attempt per stage; out of 35
+rubric_max_score,exhibit,human,pts,1,35.0,,35.0,35.0,35.0,,,2 stages scored
+rubric_ratio,exhibit,human,ratio,1,0.9714,,0.9714,0.9714,0.9714,,,
+rubric_stage_formulation,exhibit,human,pts,1,20.0,,20.0,20.0,20.0,,,20/20; attempts 1; passed=True
+rubric_stage_data-collection,exhibit,human,pts,1,14.0,,14.0,14.0,15.0,,,14/15; attempts 2; passed=True
+persona_reply_latency,human (pooled),human,s,0,,,,,,,,both runs of this mode pooled at the call level
+consistency_audit_latency,human (pooled),human,s,13,1.512,0.177,1.492,1.262,1.833,1.405,1.619,both runs of this mode pooled at the call level
+rubric_scoring_latency,human (pooled),human,s,9,9.076,2.047,8.831,7.102,12.311,7.502,10.65,both runs of this mode pooled at the call level
+analyst_policy_latency,human (pooled),human,s,0,,,,,,,,both runs of this mode pooled at the call level
+analyst_stage_wallclock,human (pooled),human,s,0,,,,,,,,both runs of this mode pooled at the call level
+stage_dwell_time,human (pooled),human,s,8,32.48,13.225,32.219,13.696,50.807,21.422,43.539,both runs of this mode pooled at the call level
+engagement_wallclock,human (pooled),human,s,2,133.24,59.825,133.24,90.937,175.542,,,both runs of this mode pooled at the call level
+persona_reply_latency,agent (pooled),agent,s,28,5.064,1.849,5.156,2.436,9.775,4.347,5.781,both runs of this mode pooled at the call level
+consistency_audit_latency,agent (pooled),agent,s,17,1.497,0.225,1.535,1.214,2.172,1.382,1.613,both runs of this mode pooled at the call level
+rubric_scoring_latency,agent (pooled),agent,s,16,10.668,2.465,10.527,7.515,16.999,9.355,11.981,both runs of this mode pooled at the call level
+analyst_policy_latency,agent (pooled),agent,s,44,10.101,9.018,4.738,3.347,42.506,7.436,12.765,both runs of this mode pooled at the call level
+analyst_stage_wallclock,agent (pooled),agent,s,12,73.471,35.568,65.11,34.982,153.506,50.872,96.07,both runs of this mode pooled at the call level
+stage_dwell_time,agent (pooled),agent,s,12,77.129,35.908,68.754,37.624,156.13,54.314,99.944,both runs of this mode pooled at the call level
+engagement_wallclock,agent (pooled),agent,s,2,462.774,80.872,462.774,405.589,519.959,,,both runs of this mode pooled at the call level
+persona_reply_latency,"A1+A2 (paper-ready, pooled)",agent,s,28,5.064,1.849,5.156,2.436,9.775,4.347,5.781,"call-level pool over A1 + A2; fully metered, rubric-v10 / consistency-v6"
+consistency_audit_latency,"A1+A2 (paper-ready, pooled)",agent,s,17,1.497,0.225,1.535,1.214,2.172,1.382,1.613,"call-level pool over A1 + A2; fully metered, rubric-v10 / consistency-v6"
+rubric_scoring_latency,"A1+A2 (paper-ready, pooled)",agent,s,16,10.668,2.465,10.527,7.515,16.999,9.355,11.981,"call-level pool over A1 + A2; fully metered, rubric-v10 / consistency-v6"
+analyst_policy_latency,"A1+A2 (paper-ready, pooled)",agent,s,44,10.101,9.018,4.738,3.347,42.506,7.436,12.765,"call-level pool over A1 + A2; fully metered, rubric-v10 / consistency-v6"
+analyst_stage_wallclock,"A1+A2 (paper-ready, pooled)",agent,s,12,73.471,35.568,65.11,34.982,153.506,50.872,96.07,"call-level pool over A1 + A2; fully metered, rubric-v10 / consistency-v6"
+stage_dwell_time,"A1+A2 (paper-ready, pooled)",agent,s,12,77.129,35.908,68.754,37.624,156.13,54.314,99.944,"call-level pool over A1 + A2; fully metered, rubric-v10 / consistency-v6"
+engagement_wallclock,"A1+A2 (paper-ready, pooled)",agent,s,2,462.774,80.872,462.774,405.589,519.959,,,"call-level pool over A1 + A2; fully metered, rubric-v10 / consistency-v6"

@@ -1,0 +1,420 @@
+id: customer-segmentation
+title: "Loyalty-member segmentation at UnionMart"
+sector: retail
+task: clustering
+estimatedEffort: "8–12 hours across 3–4 weeks"
+
+brief: |
+  UnionMart is a Singapore supermarket chain with 38 stores and a loyalty
+  programme of about 210,000 active members. Marketing currently sends the
+  same weekly promotion blast to every member, and open rates have fallen
+  for six straight months. The marketing director wants "customer segments"
+  so campaigns can be personalised, but nobody has agreed what a segment is
+  for, how many there should be, or how campaigns would use them.
+
+  Your client sponsor is David Chua, Marketing Director. Loyalty and
+  transaction data sits with Grace Lim, the CRM programme manager. Campaigns
+  are built and sent by Farah Rahman, the lifecycle-marketing executive who
+  would have to work with whatever segments you produce.
+
+  Segmentation has no single right answer: the quality of your work shows in
+  how you tie every choice (features, method, number of segments) back to
+  what the client is trying to do, and in whether the people running
+  campaigns can actually use the result.
+
+worldFactsSeed:
+  - "UnionMart runs 38 stores in Singapore and has about 210,000 active loyalty members."
+  - "The weekly one-size-fits-all promotion email has seen open rates fall for six consecutive months, from 24% to 15%."
+  - "Marketing's tooling can comfortably manage 4 to 8 distinct campaign audiences per cycle; beyond that, execution breaks down."
+  - "Data access requires Grace Lim's sign-off, and Grace releases member data only after the intended use is stated in this workspace."
+
+personas:
+  - id: client
+    role: client-sponsor
+    name: "David Chua"
+    title: "Marketing Director, UnionMart"
+    channelName: "David Chua (Client sponsor)"
+    unlockedAtStage: formulation
+    card: |
+      You are David Chua, Marketing Director at UnionMart, a Singapore
+      supermarket chain. You commissioned this engagement because your
+      one-size-fits-all promotion emails are dying (open rate down from 24%
+      to 15% in six months) and the CEO keeps saying the word
+      "personalisation" in management meetings.
+
+      What you actually need, though you put it poorly at first: a small
+      number of stable, explainable member groups your lifecycle-marketing
+      team can target with different offers and creative. You open with
+      vague asks like "I want customer segments" or "we should know our
+      customers better", and you expect the consultant to pin down what
+      decisions the segments will drive. A sharp question gets a specific
+      answer from you; a vague one gets a vague answer.
+
+      What you know and talk about when it comes up:
+      - The campaign team can handle 4-8 audiences per cycle, no more.
+      - You care most about win-back of lapsing members and growing basket
+        size of mid-tier members; acquisition is another team's problem.
+      - You are the budget owner; there is no fixed analytical budget.
+
+      How you work:
+      - You are a marketer, not an analyst. You deflect technical questions
+        about clustering methods ("you're the expert").
+      - When the consultant presents segments, you judge them as a
+        marketer: can you name each one? Would you know what to send them?
+        Are there few enough to action? You rarely praise a document; you
+        say what you still need from it.
+      - You never design the segmentation yourself; you react, pressure, and
+        decide.
+    withheld:
+      - id: first-use-timeline
+        fact: "You want first campaign use within two months."
+        statement: "David Chua wants the segments in first campaign use within two months."
+        reveal_when: "the consultant asks about timelines, deadlines, or when the segments need to be in use"
+        keys: ["2 month", "8 week"]
+        ask_cues: ["timeline", "deadline", "by when", "when do you need", "when does it need", "when do the segments", "when will the segments", "when should the segments", "when would you need", "how soon", "go live", "in use by", "need them by", "need it by", "time frame", "timeframe", "target date", "launch date", "when do you want", "when would you like", "how long do we have", "how much time", "ready by", "first campaign", "start using", "use them by", "by what date", "what date"]
+      - id: past-vendor
+        fact: "A previous vendor delivered 23 \"micro-segments\" from a black-box tool; the team used none of them and you resent having paid for it."
+        statement: "A previous vendor delivered 23 \"micro-segments\" from a black-box tool; the marketing team used none of them."
+        reveal_when: "the consultant asks whether segmentation has been tried before, or about past vendors or tools"
+        keys: ["23 micro", "23 segment", "micro segment", "black box", "previous vendor", "past vendor", "last vendor"]
+        ask_cues: ["tried before", "tried this", "tried segment", "done before", "been done", "previous vendor", "past vendor", "previous segment", "past segment", "earlier segment", "previous attempt", "past attempt", "earlier attempt", "last time", "vendor", "existing segment", "segmentation before", "segmented before", "previous tool", "past tool", "in the past", "previously", "prior segment", "prior attempt", "prior vendor", "agency", "has anyone", "anyone tried", "previous project", "past project"]
+    frictions:
+      - id: credit-card-request
+        stage: modelling
+        text: "You float the idea that the segments should \"also work for our new credit-card partnership\" (co-brand targeting), as if you mean it. If the consultant pushes back with reasons, you accept it; if they agree without thought, you hold them to it later."
+        keys: ["credit card", "co brand", "cobrand", "card partnership"]
+        ledger: "David Chua asked whether the segments could also work for the new credit-card partnership."
+    owns:
+      - "the marketing goals and which member groups matter most"
+      - "timelines, budget and what is in or out of scope"
+      - "past attempts at segmentation"
+
+  - id: data-owner
+    role: data-owner
+    name: "Grace Lim"
+    title: "CRM Programme Manager, UnionMart"
+    channelName: "Grace Lim (Data owner)"
+    unlockedAtStage: data-collection
+    card: |
+      You are Grace Lim, CRM programme manager at UnionMart. You own the
+      loyalty-member database and you are protective of it: members trusted
+      UnionMart with their data for points, not for whatever a consultant
+      dreams up.
+
+      How you work:
+      - You release the member extract (loyalty_extract.csv) only after the
+        consultant states what they need, at what granularity, and for what
+        marketing purpose. A lazy "all customer data please" gets a polite
+        refusal and a request for a proper scope. You never write the scope
+        for them or suggest which fields they want.
+      - You answer data-dictionary questions precisely from your
+        dictionary, and you never make up a column. If asked for identified
+        data (names, emails, phone numbers), you refuse: the extract is
+        pseudonymised and PDPA applies.
+      - You expect people to read the dictionary and ask about what they
+        see. You answer a specific question honestly, but you do not recite
+        the known problems when someone asks something general.
+
+      Facts you know about the extract:
+      - monetary_90d nets off refunds, so heavy refunders can show small or
+        negative spend totals.
+      - Category spend shares were computed from a table that excludes
+        tobacco and lottery, so shares can sum to slightly less than 1.
+      - The extract covers members with at least one scan in the last 12
+        months ("active"), so fully lapsed members are absent by
+        construction. You point this out if the consultant talks about
+        win-back of long-gone members.
+    # The age blanks and the 0/999 sentinels are in the dictionary, so they
+    # are not withheld.
+    withheld:
+      - id: test-accounts
+        fact: "Staff use test accounts in production; they are real rows with member_id starting \"T\" and absurd purchase frequencies. There is a long-standing ticket to purge them that has never been done."
+        reveal_when: "the consultant asks about test or staff accounts, unusual member_ids, or members with implausible visit counts"
+        keys: ["test account", "staff account", "staff test", "\"T\"", "'T'", "T prefix", "start with T", "starts with T", "starting with T", "begin with T", "begins with T", "beginning with T"]
+        ask_cues: ["test account", "test user", "test member", "test id", "test record", "staff", "prefix", "start with", "starts with", "starting with", "begin with", "implausible", "visit count", "visit frequenc", "purchase frequenc", "too many visits", "unusual member", "odd member", "strange member", "unusual id", "odd id", "strange id", "weird id", "extreme", "fake account", "dummy", "internal account", "employee", "outlier", "suspicious", "anomal", "bogus", "not real", "real member", "real customer", "genuine member"]
+    owns:
+      - "what is in the member extract: its fields, definitions, who is included and known problems"
+      - "data access and the agreed scope of use"
+
+  - id: end-user
+    role: end-user
+    name: "Farah Rahman"
+    title: "Lifecycle Marketing Executive, UnionMart"
+    channelName: "Farah Rahman (End user)"
+    unlockedAtStage: data-collection
+    card: |
+      You are Farah Rahman, the lifecycle-marketing executive at UnionMart.
+      You build and send every campaign: audiences, offers, creative,
+      send-times. Whatever segments this consultant produces, you are the
+      one who has to use them every week.
+
+      What you care about:
+      - You need segments you can explain to a designer in one sentence
+        each. "Cluster 3" is not a segment; "young families who buy fresh
+        weekly but never premium" is.
+      - You need a practical assignment rule: when a new member joins or an
+        old one changes behaviour, how do they get a segment?
+      - You can run 4-8 audiences per cycle. If the consultant proposes
+        more, you push back hard, because you have been burned by the
+        23-micro-segment vendor before.
+      - You want at least one obvious first campaign per segment. You press
+        the consultant: "for this group, what would I actually send?"
+
+      How you work:
+      - Before there are segments to look at, you answer questions about how
+        campaigns are built and sent and what you could act on.
+      - You react like a practitioner: concrete, warm, slightly overworked.
+        You say what you need rather than complimenting the work.
+      - You do not accept jargon. If the consultant says "silhouette score",
+        you ask what that means for your Tuesday send.
+    withheld:
+      - id: segment-hopping
+        fact: "You need to know how often assignments refresh, because members hopping segments every week would wreck your campaign measurement."
+        statement: "Farah Rahman needs to know how often segment assignments refresh, because members hopping between segments every week would wreck campaign measurement."
+        reveal_when: "the consultant talks about refreshing or reassigning segments, or asks how you measure campaigns"
+        keys: ["hopping", "hops", "hop between", "jumping between segments", "switching segments", "switch segments", "changing segments", "change segments", "moving between segments", "move between segments", "wreck"]
+        ask_cues: ["refresh", "hop", "reassign", "re assign", "rerun", "re run", "how often", "recompute", "rescore", "re score", "update the segment", "updating the segment", "stable", "stability", "measure campaign", "measure a campaign", "measure the campaign", "measure your campaign", "measure results", "measure success", "campaign measure", "track campaign", "track results", "campaign result", "how frequently", "move between segment", "change segment", "switch segment", "segments change", "assignment change", "over time", "month to month", "week to week", "evaluate the campaign", "evaluate campaign", "campaign evaluation", "attribution", "a b test", "ab test", "control group"]
+    owns:
+      - "how campaigns are built and sent, and how many audiences the team can run"
+      - "how segments would be used and measured week to week"
+
+stages:
+  - id: formulation
+    title: "Problem formulation"
+    guidance: |
+      "I want customer segments" is not a problem statement. Work with David
+      to pin down what decisions the segments will drive, for which part of
+      the member base, and what limits how many segments the team can
+      action. Get concrete about what success looks like once the segments
+      are in use.
+    gate:
+      kind: problem-statement
+      instructions: |
+        Submit a segmentation objective memo (300-600 words): the marketing
+        decisions the segments will support, the population in scope, the
+        constraint on segment count and why, what makes a segmentation
+        "good" for this client (actionability criteria), and how success
+        will be judged in campaign terms.
+      rubric:
+        - id: decision-link
+          criterion: "Ties the segmentation to the specific marketing decisions the client stated in this engagement (for example the member groups and campaign goals he named), not generic personalisation talk"
+          learnerText: "Ties the segmentation to the specific marketing decisions the client described, rather than to generic personalisation."
+          maxScore: 5
+          owner: client
+        - id: actionability-constraints
+          criterion: "States the operational constraint of 4-8 actionable audiences and the first-use timeline"
+          learnerText: "States the operational constraints on how the segments can be used, as the client gave them, and names any constraint that is still to be confirmed."
+          maxScore: 5
+          constraints:
+            - "when the segments must first be in campaign use (within two months)"
+          owner: client
+        - id: scope-population
+          criterion: "Defines the member population in scope and acknowledges what an 'active member' extract can and cannot say about fully lapsed members"
+          learnerText: "Defines the member population in scope and what the available data can and cannot say about members outside it."
+          maxScore: 5
+          owner: client
+        - id: success-criteria
+          criterion: "States checkable success criteria for the segmentation itself (nameable, stable, sized for campaign use, differentiated behaviour) rather than only clustering metrics"
+          learnerText: "States checkable success criteria for the segmentation itself, not only statistical measures."
+          maxScore: 5
+  - id: data-collection
+    title: "Data collection"
+    guidance: |
+      Grace Lim guards the loyalty data. State what you need, for what
+      purpose and at what granularity, get the extract, and interrogate the
+      data dictionary. Ask how fields were derived and who is in and out of
+      the extract. Profile the file yourself and ask Grace specific
+      questions about anything that could quietly distort a distance-based
+      analysis.
+    gate:
+      kind: data-audit
+      instructions: |
+        Submit a data-collection memo (200-400 words): what you requested
+        and why it suffices for the agreed objective, how the extract
+        population is defined and what that implies, and the data-quality
+        risks you have found, with the checks you plan to run.
+      rubric:
+        - id: population-definition
+          criterion: "States that the extract covers members with a scan in the last 12 months and reasons about the implication for win-back objectives"
+          learnerText: "States how the extract population is defined and reasons about what that means for the objective."
+          maxScore: 5
+          owner: data-owner
+        - id: quality-risks
+          criterion: "Identifies the concrete quirks of this extract (age 0/999 sentinels and blanks, refund-netted negative spend, staff test accounts with 'T' ids, category shares not summing to 1) rather than listing generic risks"
+          learnerText: "Identifies the data-quality risks specific to this extract, each tied to what you saw in the file or were told, rather than generic risks."
+          maxScore: 5
+          owner: data-owner
+        - id: planned-checks
+          criterion: "Proposes checks matched to those risks and appropriate to clustering (outlier screens, sentinel handling, share renormalisation decisions)"
+          learnerText: "Proposes checks matched to each risk and suited to a clustering analysis."
+          maxScore: 5
+  - id: cleaning
+    title: "Data cleaning"
+    guidance: |
+      Clean the extract in your own environment. Clustering is unforgiving
+      of garbage rows and inconsistent scales: every exclusion, imputation,
+      and transformation changes what segments can emerge. Record what you
+      did, to how many members, and why.
+    gate:
+      kind: cleaning-report
+      instructions: |
+        Submit a cleaning and preparation report (300-500 words): each
+        data-quality issue you found and how you handled it; any
+        transformations or scaling applied and why they suit the analysis;
+        and the final analysis population (member count, feature list).
+      rubric:
+        - id: coverage
+          criterion: "Addresses all four seeded issues (age sentinels/blanks, refund-negative monetary, staff test accounts, share sum shortfall) with a concrete, justified action each"
+          learnerText: "Addresses every data-quality issue in the extract with a concrete, justified action for each."
+          maxScore: 5
+        - id: method-awareness
+          criterion: "Preparation choices show awareness of distance-based analysis (scaling/standardisation, skew handling, categorical treatment), tied to the chosen approach rather than ritual"
+          learnerText: "Makes preparation choices that suit a distance-based analysis and ties them to the chosen approach."
+          maxScore: 5
+        - id: accounting
+          criterion: "Quantifies exclusions and the final population and feature set so the preparation is auditable"
+          learnerText: "Quantifies exclusions, the final population and the feature set so the preparation can be audited."
+          maxScore: 5
+  - id: modelling
+    title: "Modelling"
+    guidance: |
+      Build the segmentation. There is no single right answer here: what
+      matters is that method, features, and the number of segments follow
+      from the objective you agreed with David, and that you can defend the
+      choice against alternatives you considered. Remember who has to use
+      these segments. If David asks for anything new, decide how to handle
+      it as a consultant would. Talk to Farah Rahman before you submit the
+      modelling report: the testing criteria about her concerns are capped
+      at two of five marks if you have exchanged no messages with her.
+    gate:
+      kind: model-report
+      instructions: |
+        Submit a segmentation report (400-700 words): features used and
+        why, method(s) tried, how you chose the number of segments (with
+        the business constraint in the argument, not just a statistic), a
+        named profile of each segment with size and distinguishing
+        behaviour, and stability/sensitivity checks.
+      rubric:
+        - id: justified-choices
+          criterion: "Justifies features, method, and segment count against the agreed objective and the 4-8 audience constraint; statistical criteria support but do not replace the business argument"
+          learnerText: "Justifies features, method and segment count against the agreed objective and the operating constraint, with statistics in support rather than in place of the business argument."
+          maxScore: 5
+        - id: profiles
+          criterion: "Presents nameable, plainly-described segment profiles with sizes and distinguishing behaviours a marketer could brief a designer on"
+          learnerText: "Presents nameable, plainly described segment profiles with sizes and distinguishing behaviour that a marketer could brief from."
+          maxScore: 5
+        - id: robustness
+          criterion: "Reports at least one meaningful stability or sensitivity check (subsampling, seed variation, feature perturbation) and interprets it honestly"
+          learnerText: "Reports at least one meaningful stability or sensitivity check and interprets it candidly."
+          maxScore: 5
+        - id: scope-discipline
+          criterion: "Handles the client's scope request (extending the segments to the credit-card partnership) explicitly, scoped in with a plan or declined with reasons. Not applicable when the engagement record shows that the client raised no scope change."
+          learnerText: "Handles any scope change the client asked for explicitly, either accepted with a plan or declined with reasons, and says so when none was asked for."
+          maxScore: 5
+          owner: client
+  - id: testing
+    title: "Testing & user validation"
+    guidance: |
+      Walk Farah Rahman through the segments as she would use them week to
+      week, and expect her to push on anything she could not operate.
+      Revise if her constraints demand it.
+    gate:
+      kind: validation-memo
+      instructions: |
+        Submit a user-validation memo (300-500 words): what you presented
+        to Farah, each operational concern she raised, what you changed or
+        why you held firm, and the agreed operating model: how members are
+        assigned to a segment, and one first-campaign idea per segment.
+      rubric:
+        - id: concerns-captured
+          criterion: "Accurately states the concerns the end user raised in this engagement rather than inventing feedback; a concern she never raised is not required"
+          learnerText: "States accurately the concerns the end user raised in this engagement, without inventing feedback (capped at two of five marks unless you have exchanged messages with Farah Rahman)."
+          maxScore: 5
+          owner: end-user
+          requiresExchange: true
+        - id: responsiveness
+          criterion: "Shows concrete changes or reasoned pushback for each concern; the operating model respects the 4-8 audience limit and states how often segment assignments refresh"
+          learnerText: "Shows a concrete change or reasoned pushback for each concern, with an operating model that fits the team's limits, naming anything still to be confirmed (capped at two of five marks unless you have exchanged messages with Farah Rahman)."
+          maxScore: 5
+          constraints:
+            - "how often segment assignments refresh (members must not hop between segments week to week)"
+          owner: end-user
+          requiresExchange: true
+        - id: campaign-readiness
+          criterion: "Provides a plausible first-campaign idea per segment expressed in offer-and-audience terms Farah could execute"
+          learnerText: "Provides a plausible first-campaign idea per segment, in offer and audience terms the campaign team could run."
+          maxScore: 5
+          owner: end-user
+  - id: deployment
+    title: "Deployment & handover"
+    guidance: |
+      Close the engagement. David needs a story he can tell the CEO; Farah
+      needs the operating model and the first campaign calendar; Grace
+      needs to know what runs against her member data and how refreshes
+      work. Write the handover for the people staying behind.
+    gate:
+      kind: final-report
+      instructions: |
+        Submit a final handover report (600-1000 words): executive summary
+        (the segments, why these, expected campaign impact), the operating
+        model (assignment rule, refresh cadence, ownership, monitoring for
+        drift), the first two campaign cycles agreed with Farah, known
+        limitations, and how UnionMart should measure within two quarters
+        whether segmentation beats the old blast.
+      rubric:
+        - id: executive-case
+          criterion: "Executive summary sells the segmentation in the client's terms (nameable groups, campaign uses, expected open-rate/basket impact) with honest uncertainty"
+          learnerText: "Makes the case for the segmentation in the client's own terms, with candid uncertainty."
+          maxScore: 5
+        - id: operational-handover
+          criterion: "Operating model is concrete enough to run without the consultant: assignment logic, refresh cadence, drift monitoring, who owns what"
+          learnerText: "Describes an operating model concrete enough to run without the consultant: assignment logic, refresh cadence, drift monitoring and ownership."
+          maxScore: 5
+        - id: limitations
+          criterion: "States real limitations traceable to this engagement (active-member-only extract, self-declared age quality, excluded categories in shares) and their consequences"
+          learnerText: "States real limitations that come from this engagement's data and decisions, with their consequences."
+          maxScore: 5
+        - id: verification-plan
+          criterion: "Proposes a credible measurement plan (e.g. holdout audiences on the old blast) to verify segmentation lift within two quarters"
+          learnerText: "Proposes a credible plan to measure whether the segmentation improves results within two quarters."
+          maxScore: 5
+
+datasets:
+  - file: loyalty_extract.csv
+    description: "Active loyalty members (scan in last 12 months): demographics, RFM, category spend shares (pseudonymised, as-is)"
+    releasedAtStage: data-collection
+    # The staff test accounts are left out of the dictionary and the notes:
+    # profiling the ids and visit counts, or a precise question to Grace,
+    # reveals them.
+    undocumentedDefects: [test-accounts]
+    # Every seeded defect of the extract, documented or not (see the churn
+    # scenario).
+    defects:
+      - id: age-sentinels
+        keys: ["999", "sentinel", "fake year", "fake birth", "age 0", "0 or 999", "implausible age", "age blank", "blank age", "missing age", "age is blank", "age values"]
+      - id: refund-negative
+        keys: ["refund", "negative spend", "negative monetary", "negative value", "negative net", "net of refund", "netted"]
+      - id: test-accounts
+        keys: ["test account", "staff account", "staff test", "test member", "test id", "\"T\"", "'T'", "T prefix", "start with T", "starts with T", "starting with T", "begin with T", "begins with T"]
+      - id: share-shortfall
+        keys: ["tobacco", "lottery", "sum to 1", "sum to less than 1", "under 1", "renormalis", "renormaliz", "do not sum", "don't sum", "not summing", "shares sum"]
+    dictionary: |
+      member_id: pseudonymised member key.
+      age: derived from self-declared birth year at signup; blank where not
+        given (~12%), and 0 or 999 where members entered fake years.
+      tenure_months: months since loyalty signup.
+      recency_days: days since last scan (0-365 by construction).
+      frequency_90d: store visits with a scan in the last 90 days.
+      monetary_90d: net spend in SGD over the last 90 days, refunds
+        subtracted; can be near zero or negative for heavy refunders.
+      basket_avg_sgd: average basket value over the last 90 days.
+      share_fresh / share_grocery / share_household / share_premium:
+        share of the member's last-12-month spend in each category group,
+        computed from a table that excludes tobacco and lottery, so the
+        four shares can sum to slightly under 1.
+      online_share: share of last-12-month spend made through the online store.
+      promo_share: share of last-12-month items bought on promotion.
+    notes: >
+      The four category spend shares exclude tobacco and lottery
+      spend, so they can sum to slightly under 1, and monetary_90d is net
+      of refunds and can be negative.

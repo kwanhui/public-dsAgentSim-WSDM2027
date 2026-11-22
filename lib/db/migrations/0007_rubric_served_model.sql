@@ -1,0 +1,1 @@
+ALTER TABLE "rubric_scores" ADD COLUMN "served_model" text;

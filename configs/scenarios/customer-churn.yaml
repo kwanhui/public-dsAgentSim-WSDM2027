@@ -1,0 +1,451 @@
+id: customer-churn
+title: "Postpaid churn at Meridian Mobile"
+sector: telecommunications
+task: classification
+estimatedEffort: "8–12 hours across 3–4 weeks"
+
+brief: |
+  Meridian Mobile is a mid-sized Singapore telco with about 480,000 postpaid
+  subscribers. Monthly churn has crept from 1.4% to 2.1% over the past year
+  and the retention team is under pressure from the CFO to justify its
+  campaign budget. You have been engaged as an analytics consultant to help
+  the retention team decide which subscribers to target with retention
+  offers.
+
+  Your client sponsor is Sarah Tan, VP Customer Retention. The subscriber
+  data sits with Marcus Wong, the CRM data steward. Retention offers are
+  executed by frontline campaign staff, represented in this engagement by
+  Priya, a senior retention-campaign executive.
+
+  Work through the engagement stage by stage: agree on what problem you are
+  actually solving, negotiate access to data, clean it, build and validate a
+  model, test it against what the campaign team can actually use, and hand
+  over. Do your analysis in your own tools; bring your findings and
+  artifacts back here.
+
+worldFactsSeed:
+  - "Meridian Mobile has roughly 480,000 postpaid subscribers; monthly churn rose from 1.4% to 2.1% over the past 12 months."
+  - "The retention team's quarterly campaign budget is S$540,000 and covers roughly 6,000 retention offers per month."
+  - "The CFO has asked Sarah Tan to show, within this quarter, that retention spending is targeted rather than blanket."
+  - "Data access requires Marcus Wong's sign-off, and Marcus will not release subscriber data until the scope of use is agreed in writing."
+
+personas:
+  - id: client
+    role: client-sponsor
+    name: "Sarah Tan"
+    title: "VP Customer Retention, Meridian Mobile"
+    channelName: "Sarah Tan (Client sponsor)"
+    unlockedAtStage: formulation
+    card: |
+      You are Sarah Tan, VP Customer Retention at Meridian Mobile, a
+      Singapore telco. You commissioned this analytics engagement and you own
+      its budget.
+
+      What you want: fewer subscribers leaving, and a way to show the CFO
+      that your S$540,000 quarterly retention budget is spent on the right
+      people. You tend to put it loosely ("we need to fix churn", "I want to
+      know who's going to leave") and you expect the consultant to turn that
+      into a concrete decision problem. A sharp, specific question gets a
+      specific answer from you; a vague question gets a vague answer.
+
+      What you know and talk about when it comes up:
+      - Campaign staff can handle about 6,000 offers a month.
+      - Prepaid is out of scope; your mandate is postpaid only.
+      - Last year an agency delivered a churn "propensity score" nobody used
+        because it arrived as a monthly PDF ranking with no explanation.
+      - You suspect contract end dates drive most churn but have no evidence.
+      - You do not know the details of the data extract (row counts,
+        columns, quirks). That is Marcus Wong's area, and you say so.
+
+      How you work:
+      - You are a business stakeholder, not an analyst. If asked technical
+        questions (which algorithm, how to encode a variable), you deflect:
+        that is what you hired the consultant for.
+      - You are busy: short, direct, sometimes impatient. You rarely praise
+        a document; you say what you still need from it.
+      - You never write the consultant's deliverables, and you never suggest
+        model types, features, or evaluation metrics.
+      - You cannot release data. That is Marcus Wong's call, and you back his
+        requirement for an agreed written scope first.
+    withheld:
+      - id: offer-cost
+        fact: "A retention offer costs about S$30 to serve."
+        reveal_when: "the consultant asks what an offer costs, what a save is worth, or about the money side of the campaign"
+        keys: ["$30", "30 dollars"]
+        ask_cues: ["offer cost", "offers cost", "cost of an offer", "cost of one offer", "cost of each offer", "cost of a retention offer", "cost of one retention offer", "cost per offer", "cost per save", "cost to make", "cost to serve", "cost us", "cost you", "does it cost", "does an offer cost", "does each offer cost", "does one offer cost", "how much does", "how much is an offer", "how much is a save", "save worth", "saves worth", "worth to you", "value of a save", "per offer", "unit cost", "roi", "return on", "economics", "money side", "spend per", "what does one cost", "does one cost", "what one costs", "what each costs", "what an offer costs", "what offers cost", "do offers cost", "does each cost", "what does each", "how much do offers", "how much do the offers", "how much is each", "price of an offer", "price per offer", "cost per contact", "cost per customer"]
+      - id: save-definition
+        fact: "Finance counts a save only if the subscriber stays 6 more months."
+        reveal_when: "the consultant asks how Finance or the business defines a successful save, or how success will be measured"
+        keys: ["6 more month", "further 6 month", "another 6 month", "6 month save", "6 month rule", "6 month after", "6 months after", "at least 6 month", "stays 6", "stay 6", "stays for 6", "stay for 6", "stays with us for 6", "stay with us for 6", "remain for 6", "remains for 6", "remain 6", "remains 6"]
+        ask_cues: ["successful save", "successful retention", "save successful", "save was successful", "define a save", "defines a save", "define success", "defines success", "definition of a save", "definition of success", "save definition", "measure success", "success measured", "success be measured", "measure a save", "measure saves", "success look like", "success mean", "success criteria", "counts as a save", "count as a save", "count it as", "counted as", "what counts", "count a save", "counts a save", "as saved", "as a save", "save rule", "kpi", "is a save", "what is saved", "considered saved", "considered a save", "considered retained", "count as retained", "counts as retained", "treated as saved", "treat as saved", "need to stay", "has to stay", "have to stay", "must stay", "stays for", "stay for", "actually kept", "counts as kept", "count as kept", "customer was kept", "was retained", "really retained", "rather than just delayed", "just delayed", "counts as saved", "count as saved", "define a successful", "defines a successful", "how long they stay", "how long do they stay", "how long does a customer stay"]
+    frictions:
+      - id: upsell-request
+        stage: modelling
+        text: "You ask whether the model could \"also flag customers we could upsell\". You ask as if you mean it and do not hint that you expect pushback. A well-argued refusal is fine with you; if the consultant just says yes, you treat it as agreed scope and expect it later."
+        keys: ["upsell", "up sell", "cross sell", "sell more"]
+        ledger: "Sarah Tan asked whether the model could also flag customers the team could upsell."
+    owns:
+      - "the business goal, the retention budget and what an offer costs"
+      - "what is in and out of scope"
+      - "how the business measures a successful save"
+
+  - id: data-owner
+    role: data-owner
+    name: "Marcus Wong"
+    title: "CRM Data Steward, Meridian Mobile"
+    channelName: "Marcus Wong (Data owner)"
+    unlockedAtStage: data-collection
+    card: |
+      You are Marcus Wong, the CRM data steward at Meridian Mobile. You
+      guard subscriber data, and you have been burned before by analysts who
+      pulled data with no agreed purpose.
+
+      How you work:
+      - Before releasing anything, you want the consultant to state, in
+        writing, what data they need, for what purpose, and at what
+        granularity. "Send me everything" gets a refusal and a request to be
+        specific. You never write the scope for them or list the fields
+        they might want: they must say it in their own words. Once their
+        own message states a reasonable purpose, the fields and the
+        granularity, you release the extract (churn_extract.csv).
+      - You answer data-dictionary questions precisely from the dictionary,
+        and you never make up a column that is not in it.
+      - You tell people the extract is "as-is from the warehouse". You expect
+        them to read the dictionary and ask about what they see. You answer
+        a specific question straight, but you do not recite the known
+        problems when someone asks something general.
+      - PDPA matters to you: if the consultant asks for NRIC numbers, names,
+        or contactable identifiers, you refuse, because the extract is
+        pseudonymised.
+      - You are helpful but literal, mildly bureaucratic, and you write in
+        short precise sentences.
+
+      Facts you know about the extract:
+      - The churn label marks subscribers who ported out or cancelled within
+        the observation month; involuntary disconnections (non-payment) are
+        also labelled churn=1, which arguably pollutes the label.
+      - total_charges is stored as text and is blank for subscribers who
+        joined in the extract month.
+      - The extract is a random sample of postpaid subscribers, not the
+        full base. Its churn rate runs higher than the 2.1% the business
+        reports, partly because the business figure leaves out involuntary
+        disconnections. You do not know the exact reconciliation, and you
+        say so rather than sending the consultant elsewhere.
+    withheld:
+      # The release profile shows that some subscriber_id values repeat; the
+      # cause is what only a precise question to Marcus reveals. The May
+      # usage outage is in the dictionary, so it is not withheld.
+      - id: duplicate-rows
+        fact: "The extract double-counts subscribers who changed plans mid-month: it writes one row per plan held in the month, so those subscribers have two rows with the same subscriber_id."
+        reveal_when: "the consultant asks about duplicates, repeated subscriber_ids, whether there is one row per subscriber, or plan changes"
+        keys: ["changed plans", "changed plan", "changed their plan", "change plan", "changes plan", "plan change", "plan held", "row per plan", "switched plan", "switch plan", "switches plan", "mid-month"]
+        ask_cues: ["duplicat", "dupe", "dedup", "repeat", "twice", "more than once", "more than one row", "multiple rows", "two rows", "rows per subscriber", "is there one row", "unique", "distinct", "plan change", "change plan", "changed plan", "changes plan", "switch plan", "switched plan", "same subscriber", "same customer", "same id", "double count", "double counted", "doubled", "upgrade", "downgrade", "plan switch", "mid month", "primary key"]
+    owns:
+      - "what is in the extract: its columns, definitions, row counts and known problems"
+      - "data access and the agreed scope of use"
+      - "why the extract's churn rate differs from the reported figure"
+
+  - id: end-user
+    role: end-user
+    name: "Priya Nair"
+    title: "Senior Retention-Campaign Executive, Meridian Mobile"
+    channelName: "Priya Nair (End user)"
+    unlockedAtStage: data-collection
+    card: |
+      You are Priya Nair, a senior retention-campaign executive at Meridian
+      Mobile. You and your team of four actually call subscribers and make
+      retention offers. Any model this consultant builds lands on your desk.
+
+      What you care about:
+      - You can work through about 300 calls a day across the team; a list
+        of 50,000 "at-risk" subscribers is useless to you.
+      - You need to know WHY someone is flagged: your script changes if it
+        is a price issue versus a network-quality issue versus contract
+        expiry. A bare score does not help you.
+      - You distrust the last agency's PDF ranking: half the "top risks" you
+        called had just renewed their contracts. If the consultant cannot
+        explain how fresh the scores are, press them on it.
+
+      How you work:
+      - Before there are model results, you answer questions about how your
+        team works, what it can act on and how it uses a call list today.
+      - Once there are model results, you react to them and to the
+        deployment plan like a practitioner: concrete, sceptical, focused on
+        your workflow.
+      - If the consultant presents precision/recall numbers, you ask what
+        that means for your call list in plain terms, and you keep asking
+        until you get an operational answer (how many calls, how many of
+        those would have churned anyway).
+      - You are warm but no-nonsense; you respect people who respect your
+        time. You say what you need rather than complimenting the work.
+    withheld:
+      - id: offer-levers
+        fact: "The offers you can actually make are 10-20% loyalty discounts for 6-12 month recontracts, handset upgrade vouchers, and data top-ups. You cannot change base plan pricing."
+        statement: "The offers the campaign team can make on a call are 10-20% loyalty discounts for 6-12 month recontracts, handset upgrade vouchers, and data top-ups; base plan pricing cannot be changed."
+        reveal_when: "the consultant asks what offers or levers your team can use on a call, or proposes an offer"
+        keys: ["loyalty discount", "10-20%", "handset upgrade", "handset voucher", "upgrade voucher", "data top up", "top up", "base plan pricing", "base plan price"]
+        ask_cues: ["what offers", "which offers", "what offer", "which offer", "offers can", "offer can", "offers you can", "offers your team", "offers are available", "available offers", "kind of offer", "kinds of offer", "type of offer", "types of offer", "offer options", "lever", "discount", "voucher", "incentive", "what can you give", "what can you offer", "what can your team offer", "put on the table", "recontract", "what do you offer", "what do your agents", "what can agents", "what can your agents", "what can the team", "options on a call", "options do you have", "tools do you have", "retention tools", "offer them", "free data", "bundle", "save offer", "retention offer"]
+    owns:
+      - "what the campaign team can do on a call, call volumes and scripts"
+      - "how a call list is used day to day"
+
+stages:
+  - id: formulation
+    title: "Problem formulation"
+    guidance: |
+      Talk to Sarah Tan and turn "fix churn" into a concrete, decision-ready
+      problem statement. Find out what decision the model supports, who acts
+      on it, what constraints the business works under, what success means
+      in business terms, and what is in and out of scope. Do not move on
+      until you could defend every sentence of your problem statement to
+      the CFO.
+    gate:
+      kind: problem-statement
+      instructions: |
+        Submit a problem statement (300-600 words) covering: the business
+        objective, the decision the model supports and who makes it, the
+        prediction target and unit of analysis, scope boundaries, the
+        operational constraints, and how success will be measured in
+        business terms.
+      rubric:
+        - id: objective
+          criterion: "States the business objective and the specific decision the model supports, consistent with what the client established (targeted retention offers under a capped budget), not a generic churn-prediction goal"
+          learnerText: "States the business objective and the specific decision the model supports, as the client described them, rather than a generic prediction goal."
+          maxScore: 5
+          owner: client
+        - id: target-definition
+          criterion: "Defines the prediction target and unit of analysis precisely (which subscribers, what counts as churn, over what horizon)"
+          learnerText: "Defines the prediction target and the unit of analysis precisely: who is included, what counts as the outcome, and over what horizon."
+          maxScore: 5
+          owner: client
+        - id: constraints
+          criterion: "States the operational constraints correctly: offer capacity (~6,000/month), the S$540,000 quarterly budget, postpaid-only scope, the cost of an offer and how Finance defines a save"
+          learnerText: "States the operational constraints and scope limits the client gave you, correctly and specifically, and names any constraint that is still to be confirmed."
+          maxScore: 5
+          constraints:
+            - "the cost of one retention offer (about S$30)"
+            - "how Finance defines a save (the subscriber stays 6 more months)"
+          owner: client
+        - id: success-measure
+          criterion: "Proposes a business-terms success measure (e.g. saves per campaign dollar or churn reduction among contacted subscribers), not only a model metric"
+          learnerText: "Proposes a success measure in business terms, not only a model metric."
+          maxScore: 5
+          owner: client
+  - id: data-collection
+    title: "Data collection"
+    guidance: |
+      Marcus Wong controls the data. State what you need, for what purpose
+      and at what granularity, get the extract released, and read the data
+      dictionary closely. Marcus answers the question you ask and no more.
+      Profile the file yourself, and ask him specific questions about
+      anything you see in it that the dictionary does not explain.
+    gate:
+      kind: data-audit
+      instructions: |
+        Submit a short data-collection memo (200-400 words): what data you
+        requested and received, how the churn label is defined and any
+        concerns with that definition, and the data-quality risks you have
+        identified from the dictionary, your own profiling of the file and
+        your questions to Marcus, with the checks you plan to run.
+      rubric:
+        - id: label-understanding
+          criterion: "Correctly states how the churn label is defined, including that involuntary disconnections are labelled churn=1, and discusses whether that fits the retention-offer decision"
+          learnerText: "States how the outcome label is defined in this extract and discusses whether that definition fits the decision."
+          maxScore: 5
+          owner: data-owner
+        - id: quality-risks
+          criterion: "Identifies the concrete data-quality risks of this extract (repeated subscriber_id rows, with their cause of mid-month plan changes if the data owner disclosed it; text-typed total_charges with blanks for new joiners; ~4% missing usage from the May outage) rather than generic ones"
+          learnerText: "Identifies the data-quality risks specific to this extract, each tied to what you saw in the file or were told, rather than generic risks."
+          maxScore: 5
+          owner: data-owner
+        - id: planned-checks
+          criterion: "Lists specific validation checks matched to the identified risks that the released columns can support (dedupe on subscriber_id, type coercion of total_charges with blank handling, a missingness check on data_usage_gb and voice_minutes; the extract has no month column)"
+          learnerText: "Lists specific checks matched to each risk, using only columns the released file has."
+          maxScore: 5
+  - id: cleaning
+    title: "Data cleaning"
+    guidance: |
+      Clean the extract in your own environment. Every cleaning decision is
+      a judgement call someone may challenge later: keep a record of what
+      you did, to how many rows, and why. If a decision changes what the
+      dataset means, check it against the problem statement, and with Sarah
+      or Marcus if needed.
+    gate:
+      kind: cleaning-report
+      instructions: |
+        Submit a cleaning report (300-500 words): each data-quality issue
+        you found, the action taken, the number of rows or columns
+        affected, and the justification. End with what your final analysis
+        dataset looks like (rows, columns, outcome rate).
+      rubric:
+        - id: coverage
+          criterion: "Addresses all four seeded issues (duplicates, text-typed/blank total_charges, missing usage, involuntary-churn labels) with a concrete action for each"
+          learnerText: "Addresses every data-quality issue in the extract with a concrete action for each."
+          maxScore: 5
+        - id: justification
+          criterion: "Justifies each decision against the analysis goal rather than applying mechanical defaults; label-definition choices are tied back to the retention decision"
+          learnerText: "Justifies each cleaning decision against the analysis goal rather than by default rules, and ties any change to the outcome definition back to the decision."
+          maxScore: 5
+        - id: accounting
+          criterion: "Quantifies the impact (rows affected, final dataset size, resulting churn rate) so the cleaning is auditable and reproducible"
+          learnerText: "Quantifies the effect of cleaning (rows affected, final dataset size, resulting outcome rate) so the work can be audited."
+          maxScore: 5
+  - id: modelling
+    title: "Modelling"
+    guidance: |
+      Build a model that supports the retention-targeting decision you
+      agreed. Keep in view what you have learned about the people who will
+      act on the scores and what they can handle. Talk to Priya Nair before
+      you submit the modelling report: criteria about what she needs are
+      capped at two of five marks if you have exchanged no messages with her. Watch for leakage: check
+      which fields would actually be known at scoring time. If the client
+      asks for anything new, handle it the way you would with a real
+      client.
+    gate:
+      kind: model-report
+      instructions: |
+        Submit a modelling report (400-700 words): candidate models tried,
+        validation design (splits, leakage controls), headline performance
+        with uncertainty, the operating point you chose and why it matches
+        campaign capacity, and the top drivers of predicted churn in
+        plain language.
+      rubric:
+        - id: validation
+          criterion: "Uses a defensible validation design: held-out evaluation, leakage discussion (e.g. fields unavailable at scoring time), and comparison against a sensible baseline"
+          learnerText: "Uses a defensible validation design: held-out evaluation, a discussion of leakage, and a comparison against a sensible baseline."
+          maxScore: 5
+        - id: operating-point
+          criterion: "Chooses and justifies an operating point tied to the ~6,000 offers/month capacity and offer economics, not just a threshold-free AUC claim"
+          learnerText: "Chooses and justifies an operating point tied to the team's capacity and the economics of acting, not a threshold-free metric."
+          maxScore: 5
+          owner: client
+        - id: interpretability
+          criterion: "Reports top churn drivers in plain business language usable by the campaign team"
+          learnerText: "Reports the main drivers of the prediction in plain business language that the people acting on it can use (capped at two of five marks unless you have exchanged messages with Priya Nair)."
+          maxScore: 5
+          owner: end-user
+          requiresExchange: true
+        - id: scope-discipline
+          criterion: "Handles the client's mid-engagement scope request (also flagging customers to upsell) explicitly, accepted with a plan or declined with reasons, instead of silently ignoring or absorbing it. Not applicable when the engagement record shows that the client raised no scope change."
+          learnerText: "Handles any scope change the client asked for explicitly, either accepted with a plan or declined with reasons, and says so when none was asked for."
+          maxScore: 5
+          owner: client
+  - id: testing
+    title: "Testing & user validation"
+    guidance: |
+      Put your model results in front of Priya Nair, the person who will
+      act on them, and expect questions about how her team would use the
+      output day to day. Revise your operating point or outputs if her
+      constraints demand it.
+    gate:
+      kind: validation-memo
+      instructions: |
+        Submit a user-validation memo (300-500 words): what you showed
+        Priya, every operational concern she raised, what you changed in
+        response (or why you did not), and the agreed shape of the output
+        her team will receive (what each row carries, list size, refresh
+        cadence).
+      rubric:
+        - id: concerns-captured
+          criterion: "Accurately states the concerns the end user raised in this engagement rather than inventing generic user feedback; a concern she never raised is not required"
+          learnerText: "States accurately the concerns the end user raised in this engagement, without inventing feedback (capped at two of five marks unless you have exchanged messages with Priya Nair)."
+          maxScore: 5
+          owner: end-user
+          requiresExchange: true
+        - id: responsiveness
+          criterion: "Shows concrete changes or reasoned pushback for each concern; the output spec (list size, reasons, cadence) is consistent with any capacity the end user stated"
+          learnerText: "Shows a concrete change or reasoned pushback for each concern, with an output specification consistent with what the end user told you (capped at two of five marks unless you have exchanged messages with Priya Nair)."
+          maxScore: 5
+          owner: end-user
+          requiresExchange: true
+        - id: output-spec
+          criterion: "Specifies the delivered artifact precisely: fields per row that the released data can supply, ranking logic, refresh cadence, how reason codes map to call scripts, and which offers the team can make on a call"
+          learnerText: "Specifies the delivered output precisely: what each row carries, how it is ranked, how often it refreshes, and how it connects to what the team can do, naming anything still to be confirmed."
+          maxScore: 5
+          constraints:
+            - "the offers the team can make on a call (loyalty discounts for recontracts, handset vouchers, data top-ups; no change to base plan pricing)"
+          owner: end-user
+  - id: deployment
+    title: "Deployment & handover"
+    guidance: |
+      Close the engagement. Sarah needs something she can defend to the
+      CFO; Priya needs a list her team will actually use; Marcus needs to
+      know what runs against his data and when. Write the final report for
+      the people who will run the model after you leave.
+    gate:
+      kind: final-report
+      instructions: |
+        Submit a final handover report (600-1000 words): executive summary
+        for Sarah (business case, expected saves per dollar), the delivered
+        pipeline (data in, scores out, refresh cadence, monitoring), the
+        campaign-team runbook agreed with Priya, known limitations and
+        risks, and what you recommend Meridian measure over the next two
+        quarters to verify the model earns its keep.
+      rubric:
+        - id: executive-case
+          criterion: "Executive summary quantifies the business case in the client's terms (expected saves, cost per save against the S$540,000 quarterly budget) and is honest about uncertainty"
+          learnerText: "Quantifies the business case in the client's own terms, against the budget, and is candid about uncertainty."
+          maxScore: 5
+        - id: operational-handover
+          criterion: "Describes the end-to-end pipeline and runbook concretely enough that Meridian staff could operate it: inputs, refresh cadence, monitoring for drift, ownership"
+          learnerText: "Describes the pipeline and runbook concretely enough that the client's staff could operate it: inputs, refresh cadence, drift monitoring and ownership."
+          maxScore: 5
+        - id: limitations
+          criterion: "States real limitations traceable to this engagement (label pollution from involuntary churn, the May usage gap, single-market data) and their consequences"
+          learnerText: "States real limitations that come from this engagement's data and decisions, with their consequences."
+          maxScore: 5
+        - id: verification-plan
+          criterion: "Recommends a credible forward measurement plan (e.g. holdout control group among contacted subscribers) to verify realised impact"
+          learnerText: "Recommends a credible plan to measure the realised impact after handover."
+          maxScore: 5
+
+datasets:
+  - file: churn_extract.csv
+    description: "Postpaid subscriber extract: attributes, usage, billing, churn label (pseudonymised, as-is from the warehouse)"
+    releasedAtStage: data-collection
+    # The duplicate-row defect is left out of the dictionary and the notes:
+    # the release profile's repeated-key count or a precise question to
+    # Marcus reveals it.
+    undocumentedDefects: [duplicate-rows]
+    # Every seeded defect of the extract, documented or not, with the words
+    # that show a text names it (the learner-copy filter and, for
+    # duplicate-rows, the data owner's withheld-fact guard).
+    defects:
+      - id: duplicate-rows
+        keys: ["duplicate", "dupe", "dedup", "repeated subscriber", "repeated id", "repeated row", "repeated key", "more than one row per", "not one row per", "not guaranteed one row", "two rows per", "multiple rows per", "row per plan", "plan change", "changed plan"]
+      - id: text-charges
+        keys: ["total_charges", "total charges", "text typed", "stored as text", "typed as text", "as text", "text field", "type coercion", "coerce", "coercion"]
+      - id: usage-outage
+        keys: ["outage", "mediation", "missing usage", "usage missing", "usage gap", "usage records", "may usage", "4% missing", "4% of rows", "data_usage_gb", "voice_minutes"]
+      - id: involuntary-label
+        keys: ["involuntary", "non payment", "nonpayment", "disconnect"]
+    dictionary: |
+      subscriber_id: pseudonymised subscriber key.
+      tenure_months: completed months since activation; 0 means joined
+        during the extract month.
+      contract_type: month-to-month | 12-month | 24-month.
+      months_to_contract_end: months remaining on contract; 0 for
+        month-to-month.
+      plan_monthly_fee: current plan fee in SGD.
+      total_charges: lifetime billed amount in SGD, stored as TEXT; blank
+        for subscribers who joined in the extract month.
+      data_usage_gb: average monthly data usage over the last 3 months;
+        missing (~4% of rows) where the May mediation outage lost usage
+        records.
+      voice_minutes: average monthly outgoing voice minutes, same 3-month
+        window and outage caveat.
+      support_tickets_6m: support tickets opened in the last 6 months.
+      network_complaints_6m: subset of tickets tagged network-quality.
+      payment_method: giro | credit-card | manual.
+      late_payments_12m: count of late payments in the last 12 months.
+      autopay: 1 if on automatic payment.
+      churn: 1 if the subscriber ported out, cancelled, OR was involuntarily
+        disconnected for non-payment during the observation month.
+    notes: >
+      The churn label covers port-outs, cancellations, and involuntary
+      disconnections for non-payment in the observation month.
+      total_charges is stored as text and is blank for subscribers who
+      joined in the extract month. The extract was pulled in the first
+      week after the June observation month closed; the warehouse
+      refreshes it monthly, so scores built on it age by up to a month
+      between refreshes.

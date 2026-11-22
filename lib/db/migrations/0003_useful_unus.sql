@@ -1,0 +1,1 @@
+ALTER TABLE "checkins" ADD COLUMN "goal" text;

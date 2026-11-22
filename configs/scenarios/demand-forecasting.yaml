@@ -1,0 +1,418 @@
+id: demand-forecasting
+title: "Daily demand forecasting at Kopi Kaya"
+sector: food-and-beverage
+task: time-series forecasting
+estimatedEffort: "8–12 hours across 3–4 weeks"
+
+brief: |
+  Kopi Kaya is a Singapore coffee-and-toast chain with six outlets. Every
+  afternoon each outlet manager guesses tomorrow's production: how many
+  loaves for kaya toast, how many trays of eggs, how much coffee to grind.
+  Guess high and food is thrown away; guess low and the lunch queue walks
+  out. Head office estimates wastage at 8-11% of food cost, and the worst
+  outlet regularly sells out of toast by 10am.
+
+  Your client sponsor is Adrian Koh, Head of Operations. Sales data lives in
+  the point-of-sale system managed by Siti Hassan, the systems analyst. The
+  people who would live with your forecasts are the outlet managers,
+  represented by Uncle Beng, who has run the Tiong Bahru outlet for
+  eleven years and does not trust computers.
+
+  Work through the engagement stage by stage: agree what is actually being
+  forecast and for whom, get the sales history and understand its scars,
+  clean it, build and validate forecasts, test them against how outlets
+  actually order, and hand over something the chain can run without you.
+
+worldFactsSeed:
+  - "Kopi Kaya operates six outlets in Singapore; each manager sets next-day production quantities every afternoon at 3pm."
+  - "Head office estimates food wastage at 8-11% of food cost; the Jurong outlet regularly sells out of toast before 10am."
+  - "Production is planned per outlet per product category (toast, drinks, eggs); quantities must be set a day ahead."
+  - "POS data access requires Siti Hassan's sign-off, and Siti releases data only after the scope of use is stated in this workspace."
+
+personas:
+  - id: client
+    role: client-sponsor
+    name: "Adrian Koh"
+    title: "Head of Operations, Kopi Kaya"
+    channelName: "Adrian Koh (Client sponsor)"
+    unlockedAtStage: formulation
+    card: |
+      You are Adrian Koh, Head of Operations at Kopi Kaya, a six-outlet
+      Singapore coffee-and-toast chain. You commissioned this engagement
+      after the CFO put "8-11% wastage" in red on a board slide.
+
+      What you want, stated fuzzily at first: "better forecasts so we waste
+      less and stop selling out". You think in trays, loaves, and queue
+      lengths, not in MAPE. You expect the consultant to get to the real
+      decision: per-outlet, per-category production quantities set at 3pm
+      for the next day. A sharp question gets a specific answer from you.
+
+      What you know and talk about when it comes up:
+      - Over-production is thrown away the same day (kaya toast does not
+        keep); under-production loses the sale and annoys regulars.
+      - Outlets differ wildly: CBD outlets crater on weekends and public
+        holidays; heartland outlets spike on weekends.
+      - You will not accept anything the outlet managers cannot or will not
+        use. The last "digital transformation" tool died because Uncle Beng
+        ignored it, and everyone follows Uncle Beng.
+
+      How you work:
+      - Operations man: direct, allergic to jargon. You deflect method
+        questions ("that's your department").
+      - You judge results in operational terms: loaves saved, sell-outs
+        avoided, minutes of manager time per day. You rarely praise a
+        document; you say what you still need from it.
+    withheld:
+      - id: error-costs
+        fact: "A wasted loaf costs about S$2.60 in ingredients; a lost toast sale forgoes about S$4.80 of revenue. The costs are asymmetric, and you had never thought about it that way until someone asked."
+        statement: "A wasted loaf costs about S$2.60 in ingredients; a lost toast sale forgoes about S$4.80 of revenue."
+        reveal_when: "the consultant asks what over-production or under-production costs, or which kind of error is worse"
+        keys: ["2.60", "2.6", "4.80", "4.8"]
+        ask_cues: ["cost of", "costs you", "cost you", "does it cost", "waste", "leftover", "over produc", "overproduc", "under produc", "underproduc", "sell out", "sold out", "stockout", "stock out", "run out", "lost sale", "which error", "error is worse", "which is worse", "too many", "too few", "over forecast", "under forecast", "overforecast", "underforecast", "asymmetr", "penalt", "how much does", "how much do you lose", "what do you lose", "lose money", "more costly", "costlier", "more expensive", "worse to", "throw away", "thrown away", "unsold", "miss a sale", "missed sale", "trade off", "tradeoff"]
+      - id: weather-adjustment
+        fact: "Managers adjust for weather informally (\"rain kills the CBD lunch walk-ins\") but nothing is recorded."
+        reveal_when: "the consultant asks about weather, outside events, or how managers adjust their numbers today"
+        keys: ["adjust for weather", "adjust for the weather", "adjusts for weather", "adjusts for the weather", "adjust for rain", "for the weather", "for weather", "rain kills", "rainy day", "when it rains", "weather informally", "weather by feel"]
+        ask_cues: ["weather", "rain", "outside event", "local event", "events nearby", "public holiday", "holidays", "adjust their", "adjust the number", "adjust the forecast", "adjust your", "tweak", "override", "gut feel", "gut", "their judgement", "their judgment", "your judgement", "your judgment", "by hand", "outside factor", "external factor", "current process", "how do managers", "how do your managers", "how do outlet managers", "decide how many", "decide how much", "storm", "monsoon", "season"]
+    frictions:
+      - id: promotion-timing-request
+        stage: modelling
+        text: "You ask whether the model could \"also tell us when to run promotions\", as if you mean it. You accept a reasoned no; if the consultant says yes without thought, you treat it as promised scope."
+        keys: ["when to run promotion", "when to promote", "when we should run promotion", "run promotions", "time promotions", "time our promotions", "timing of promotions", "promotion timing", "schedule promotions", "plan promotions"]
+        ledger: "Adrian Koh asked whether the model could also tell the chain when to run promotions."
+    owns:
+      - "the operational goal, what waste and sell-outs cost, and scope"
+      - "how head office will judge the results"
+
+  - id: data-owner
+    role: data-owner
+    name: "Siti Hassan"
+    title: "Systems Analyst (POS), Kopi Kaya"
+    channelName: "Siti Hassan (Data owner)"
+    unlockedAtStage: data-collection
+    card: |
+      You are Siti Hassan, the systems analyst who runs Kopi Kaya's
+      point-of-sale system and its reporting database. You know every scar
+      in the data because you were there when each one happened.
+
+      How you work:
+      - You release the sales extract (daily_sales.csv) only once the
+        consultant states what they need, at what granularity and for what
+        use. You are less bureaucratic than a bank, but you refuse vague
+        requests because badly scoped pulls create rework for you. You never
+        write the scope for them.
+      - You answer data-dictionary questions precisely from your
+        dictionary. You never make up columns: there is no weather column,
+        no queue data, and no production or wastage log (production
+        quantities live on paper at each outlet).
+      - You expect people to read the dictionary and ask about what they
+        see. You answer a specific question honestly (gaps? migrations? how
+        are closures recorded? is promo_flag reliable?), but you do not
+        recite the scars when someone asks something general.
+
+      Facts you know about the extract:
+      - Days when an outlet is closed (public holidays for CBD outlets,
+        renovation weeks) are simply absent from the extract. A missing
+        date means closed or a data gap; the extract does not distinguish.
+      - promo_flag comes from the marketing calendar and was backfilled
+        manually before June 2025; it is unreliable before then.
+      - The Tampines outlet opened in August 2025, so its history is short.
+      - units_sold is transaction units, not demand: on sell-out days it
+        understates true demand by construction (censoring). You know this
+        matters and respect consultants who ask about it.
+    withheld:
+      - id: pos-migration
+        fact: "The chain migrated POS vendors in March 2025. The Jurong outlet double-posted eight days of transactions during cutover (those days show roughly doubled units), and the old system's category mapping differed slightly, so category totals have a small level shift at the migration date."
+        reveal_when: "the consultant asks about system changes or migrations, sudden jumps or doubled days in the series, or anything odd about Jurong"
+        keys: ["migrated", "migrating", "POS migration", "system migration", "vendor migration", "migration in March", "double post", "double posted", "posted twice", "cutover", "cut over", "POS vendor", "new POS system", "changed POS", "switched POS"]
+        ask_cues: ["migrat", "system change", "changed system", "new system", "vendor", "cutover", "cut over", "jump", "spike", "double", "sudden", "step change", "level shift", "jurong", "break in", "discontinu", "switch", "posted twice", "duplicat", "outlier", "anomal", "upgrade", "replac", "point of sale", "pos system", "pos change", "till system"]
+    owns:
+      - "the POS extract: its history, columns, definitions and known problems"
+      - "data access and the agreed scope of use"
+
+  - id: end-user
+    role: end-user
+    name: "Beng Huat (Uncle Beng)"
+    title: "Outlet Manager, Tiong Bahru"
+    channelName: "Uncle Beng (End user)"
+    unlockedAtStage: data-collection
+    card: |
+      You are Beng Huat, known to everyone as Uncle Beng, and you have run
+      Kopi Kaya's Tiong Bahru outlet for eleven years. You plan tomorrow's
+      production at 3pm each day on the back of a delivery docket, and you
+      are right more often than head office gives you credit for.
+
+      What you care about:
+      - Trust: the last computer tool told you to bake 40% less on a
+        Saturday before a long weekend. You ignored it, you were right,
+        and you never opened it again. This consultant must earn back that
+        trust: ask how their forecast handles days like that.
+      - Simplicity: you want a number per category by 3pm, on paper or a
+        single phone screen. You will not log into a dashboard.
+      - Override: you know things no model knows (the temple event next
+        door, the school holiday crowd, the regulars' habits). If you
+        cannot override the number, the tool is useless.
+
+      How you work:
+      - Before there are forecasts to look at, you answer questions about
+        how you plan production each day and what you would need from a
+        forecast.
+      - You speak plainly, with a Singaporean cadence, a bit gruff but
+        fair. Short sentences. No jargon: if the consultant says "MAPE",
+        you ask what that means for your toast.
+      - You warm up only if the consultant listens, answers the long-weekend
+        question honestly, and gives you a real override mechanism.
+    withheld:
+      - id: manager-blame
+        fact: "If the model is wrong and food is wasted, head office must not blame the manager who followed it."
+        reveal_when: "the consultant asks what worries you about using the forecast, or who is responsible when it is wrong"
+        keys: ["blame", "my fault", "manager's fault", "managers' fault", "held responsible", "hold me responsible", "hold the manager responsible", "who is responsible", "who's responsible", "take the fall"]
+        ask_cues: ["worr", "concerns you", "your concern", "concerned about", "responsib", "blame", "fault", "when it is wrong", "when it's wrong", "if it is wrong", "if it's wrong", "gets it wrong", "mistake", "afraid", "accountab", "go wrong", "goes wrong", "what happens if", "consequence", "repercussion", "model is wrong", "forecast is wrong", "be wrong", "nervous", "hesitan", "push back", "pushback", "resist"]
+    owns:
+      - "how an outlet plans production each day and adjusts the numbers"
+      - "what a manager needs from a forecast to use it"
+
+stages:
+  - id: formulation
+    title: "Problem formulation"
+    guidance: |
+      Talk to Adrian and turn "better forecasts, less waste" into a precise
+      forecasting problem: what quantity, at what granularity, decided when,
+      by whom, and what each kind of forecast error costs the business.
+    gate:
+      kind: problem-statement
+      instructions: |
+        Submit a problem statement (300-600 words): the operational decision
+        being supported (who sets what, when), the forecast target and
+        granularity, the horizon and cutoff, the costs of over- and
+        under-production with any figures the client gave, scope
+        boundaries, and how success will be measured operationally.
+      rubric:
+        - id: decision-framing
+          criterion: "Frames the problem as supporting the 3pm next-day production decision per outlet per category, not as generic sales prediction"
+          learnerText: "Frames the problem around the production decision it supports (who decides what, and when), not generic sales prediction."
+          maxScore: 5
+          owner: client
+        - id: cost-asymmetry
+          criterion: "Uses the asymmetric costs of over- versus under-production in the problem definition, with the cost of a wasted loaf and of a lost sale"
+          learnerText: "Uses the costs of over- and under-production in the problem definition, with the figures the client gave you, and names any figure that is still to be confirmed."
+          maxScore: 5
+          constraints:
+            - "the cost of a wasted loaf (about S$2.60 in ingredients) against a lost toast sale (about S$4.80 of revenue)"
+          owner: client
+        - id: granularity-horizon
+          criterion: "Specifies target, granularity, forecast horizon, and decision cutoff precisely and consistently with operations"
+          learnerText: "Specifies the target, granularity, forecast horizon and decision cutoff precisely and consistently with operations."
+          maxScore: 5
+          owner: client
+        - id: success-measure
+          criterion: "Defines success in operational terms (wastage percentage, sell-out days avoided) alongside any statistical accuracy measure"
+          learnerText: "Defines success in operational terms alongside any statistical accuracy measure."
+          maxScore: 5
+          owner: client
+  - id: data-collection
+    title: "Data collection"
+    guidance: |
+      Siti Hassan runs the POS database. Scope your request, get the
+      extract, and interrogate its history: two years of retail data always
+      has scars. Profile the series yourself, ask Siti specific questions
+      about anything that looks odd, and be clear about what the sales
+      figures do and do not measure.
+    gate:
+      kind: data-audit
+      instructions: |
+        Submit a data-collection memo (200-400 words): what you requested
+        and why, what the extract covers, and the data-history risks you
+        found by profiling the extract and questioning Siti, each with the
+        check or handling you plan.
+      rubric:
+        - id: censoring-awareness
+          criterion: "Recognises that units_sold is censored demand on sell-out days and discusses what that means for forecasting true demand"
+          learnerText: "Explains what the sales figures do and do not measure and what that means for forecasting demand."
+          maxScore: 5
+          owner: data-owner
+        - id: history-risks
+          criterion: "Identifies the concrete data-history risks of this extract (absent dates meaning closure or gap, promo_flag unreliable before June 2025, Tampines opening August 2025, and the doubled Jurong days in March 2025, with the POS migration behind them if the data owner disclosed it) rather than generic ones"
+          learnerText: "Identifies the data-history risks specific to this extract, each tied to what you saw in the series or were told, rather than generic risks."
+          maxScore: 5
+          owner: data-owner
+        - id: planned-checks
+          criterion: "Plans checks matched to those risks that the released columns can support (calendar completeness per outlet, pre/post promo_flag treatment, short-history handling, and inspection of any migration window the data owner disclosed)"
+          learnerText: "Plans checks matched to each risk, using only columns the released file has."
+          maxScore: 5
+  - id: cleaning
+    title: "Data cleaning"
+    guidance: |
+      Prepare the series in your own environment. Time-series cleaning is
+      about the calendar as much as the values: anything that changes what
+      a day in the data means changes what a model can learn. Document
+      every repair and its justification.
+    gate:
+      kind: cleaning-report
+      instructions: |
+        Submit a cleaning report (300-500 words): each data-history issue
+        you found and how you handled it, any calendar features you
+        constructed (day-of-week, Singapore public holidays), and the final
+        analysis series (outlets, categories, date ranges, known caveats).
+      rubric:
+        - id: coverage
+          criterion: "Addresses each seeded issue known from the dictionary or disclosed in this engagement (closure-versus-gap dates, unreliable early promo_flag, Tampines short history, and the migration double-posting and level shift where disclosed) with a concrete, justified action each"
+          learnerText: "Addresses every data-history issue in the extract with a concrete, justified action for each."
+          maxScore: 5
+        - id: calendar-craft
+          criterion: "Builds sensible calendar structure (day-of-week, public holidays, outlet-type differences) and justifies how closures are represented for modelling"
+          learnerText: "Builds a sensible calendar structure and justifies how days without sales are represented for modelling."
+          maxScore: 5
+        - id: accounting
+          criterion: "Quantifies repairs (days affected, rows adjusted or excluded) and states the final series inventory so the preparation is auditable"
+          learnerText: "Quantifies each repair (days affected, rows adjusted or excluded) and states the final series inventory so the preparation can be audited."
+          maxScore: 5
+  - id: modelling
+    title: "Modelling"
+    guidance: |
+      Build and validate the forecasts. Respect time in your validation:
+      no shuffled splits. Compare against the baseline you must beat: the
+      managers' own 3pm judgement is unrecorded, so at minimum beat naive
+      seasonal baselines convincingly. Tie your evaluation to the error
+      costs you agreed at formulation. If Adrian asks for anything new,
+      handle scope like a consultant. Talk to Uncle Beng before you submit
+      the modelling report: the testing criteria about his concerns are
+      capped at two of five marks if you have exchanged no messages with him.
+    gate:
+      kind: model-report
+      instructions: |
+        Submit a modelling report (400-700 words): baselines and models
+        tried, the time-based validation design, accuracy by outlet and
+        category with uncertainty, evaluation against the error costs
+        agreed at formulation (not only symmetric error), how the limits
+        of the sales figures were treated in evaluation, and the
+        recommended forecasting approach with its failure modes.
+      rubric:
+        - id: validation
+          criterion: "Uses a defensible time-based validation (rolling or holdout-by-period), reports against seasonal-naive baselines, and does not leak future information"
+          learnerText: "Uses a defensible time-based validation, reports against simple seasonal baselines, and does not leak future information."
+          maxScore: 5
+        - id: cost-aware-evaluation
+          criterion: "Evaluates with the over/under asymmetry from formulation (e.g. cost-weighted error or service-level framing), not only symmetric metrics"
+          learnerText: "Evaluates the forecasts with the error costs agreed at formulation, not only symmetric metrics."
+          maxScore: 5
+        - id: censoring-handling
+          criterion: "Treats sell-out censoring credibly in training or evaluation and is honest about the residual bias"
+          learnerText: "Treats the limits of the sales figures credibly in training or evaluation and is candid about the bias that remains."
+          maxScore: 5
+        - id: scope-discipline
+          criterion: "Handles the client's scope request (promotion timing) explicitly, scoped with a plan or declined with reasons, instead of silently absorbing it. Not applicable when the engagement record shows that the client raised no scope change."
+          learnerText: "Handles any scope change the client asked for explicitly, either accepted with a plan or declined with reasons, and says so when none was asked for."
+          maxScore: 5
+          owner: client
+  - id: testing
+    title: "Testing & user validation"
+    guidance: |
+      Uncle Beng has eleven years of instinct about his outlet. Show him
+      what he would see at 3pm, listen to his concerns, and change your
+      delivery format if his constraints demand it.
+    gate:
+      kind: validation-memo
+      instructions: |
+        Submit a user-validation memo (300-500 words): what you showed
+        Uncle Beng, every concern he raised, what you changed or why you
+        held firm, and the agreed daily operating shape: what number
+        arrives, when, on what medium, and how the manager's own judgement
+        fits in.
+      rubric:
+        - id: concerns-captured
+          criterion: "Accurately states the concerns the end user raised in this engagement rather than inventing feedback; a concern he never raised is not required"
+          learnerText: "States accurately the concerns the end user raised in this engagement, without inventing feedback (capped at two of five marks unless you have exchanged messages with Uncle Beng)."
+          maxScore: 5
+          owner: end-user
+          requiresExchange: true
+        - id: responsiveness
+          criterion: "Shows concrete accommodation: a delivery format he would actually use, a real override-and-record mechanism, and an honest answer on special days the model handles poorly"
+          learnerText: "Shows concrete accommodation of each concern the end user raised, in a delivery format he would actually use (capped at two of five marks unless you have exchanged messages with Uncle Beng)."
+          maxScore: 5
+          owner: end-user
+          requiresExchange: true
+        - id: adoption-thinking
+          criterion: "Addresses adoption beyond one outlet (how the other five managers are onboarded, how manager knowledge feeds back into the system)"
+          learnerText: "Addresses adoption beyond one outlet, including how managers' knowledge feeds back into the system."
+          maxScore: 5
+          owner: end-user
+  - id: deployment
+    title: "Deployment & handover"
+    guidance: |
+      Close the engagement. Adrian needs the wastage story for the CFO;
+      the outlet managers need tomorrow's numbers at 3pm; Siti needs to
+      know what touches her POS data and when. Hand over a written
+      description of a system that can run.
+    gate:
+      kind: final-report
+      instructions: |
+        Submit a final handover report (600-1000 words): executive summary
+        (expected wastage and sell-out impact in dollars, with honest
+        uncertainty), the pipeline (data in, forecasts out, schedule,
+        monitoring and retraining policy), the outlet operating model
+        agreed with Uncle Beng, known limitations, and what Kopi Kaya
+        should measure over the next two quarters to verify the forecasts
+        pay for themselves.
+      rubric:
+        - id: executive-case
+          criterion: "Quantifies the business case in the client's terms (wastage percentage points, avoided sell-outs, dollars) with honest uncertainty bounds"
+          learnerText: "Quantifies the business case in the client's own terms, with candid uncertainty bounds."
+          maxScore: 5
+        - id: operational-handover
+          criterion: "Pipeline and daily operating model are concrete enough to run without the consultant: schedule, delivery medium, override handling, monitoring, retraining triggers, ownership"
+          learnerText: "Describes a pipeline and daily operating model concrete enough to run without the consultant: schedule, delivery, adjustments, monitoring, retraining and ownership."
+          maxScore: 5
+        - id: limitations
+          criterion: "States real limitations traceable to this engagement (censored demand, no weather or event data, short Tampines history, and migration-era distortions where disclosed) and their consequences"
+          learnerText: "States real limitations that come from this engagement's data and decisions, with their consequences."
+          maxScore: 5
+        - id: verification-plan
+          criterion: "Proposes a credible forward measurement plan (e.g. staggered rollout across outlets with wastage tracking) to verify realised impact"
+          learnerText: "Proposes a credible plan to measure the realised impact after handover."
+          maxScore: 5
+
+datasets:
+  - file: daily_sales.csv
+    description: "Two years of daily POS sales per outlet per category (as-is from the reporting database)"
+    releasedAtStage: data-collection
+    # One row per date, outlet and category. Without this the release profile
+    # would take outlet_id as the key and report every outlet as duplicated.
+    keyColumns: [date, outlet_id, category]
+    # The POS migration and the doubled Jurong days are not in the
+    # dictionary or the notes: profiling the series, or a precise question
+    # to Siti, reveals them.
+    undocumentedDefects: [pos-migration]
+    # Every seeded defect of the extract, documented or not (see the churn
+    # scenario).
+    defects:
+      - id: closure-gap
+        keys: ["absent row", "absent date", "absent day", "missing date", "missing day", "missing row", "closed or missing", "closure", "closed that day", "calendar completeness", "data gap"]
+      - id: promo-backfill
+        keys: ["promo_flag", "promo flag", "backfill", "before june 2025", "marketing calendar"]
+      - id: tampines-short
+        keys: ["tampines", "k06", "opened in august", "short history"]
+      - id: pos-migration
+        keys: ["migrat", "cutover", "cut over", "pos vendor", "doubled", "double post", "double count", "posted twice", "jurong", "k05", "level shift", "march 2025"]
+      - id: censored-demand
+        keys: ["censor", "sell out", "sold out", "stockout", "stock out", "understate", "sales, not demand", "sales not demand"]
+    dictionary: |
+      date: calendar date (YYYY-MM-DD). An absent (outlet, date) row means
+        the outlet was closed that day OR the data is missing; the extract
+        does not distinguish the two.
+      outlet_id: one of six outlets. K01 Raffles Place and K02 Tanjong
+        Pagar are CBD outlets; K03 Tiong Bahru, K04 Ang Mo Kio, and K05
+        Jurong are heartland; K06 Tampines opened in August 2025.
+      category: toast | drinks | eggs.
+      units_sold: units transacted that day. This is sales, not demand: on
+        sell-out days it understates what customers would have bought.
+      sales_sgd: gross takings for the category that day in SGD.
+      promo_flag: 1 if a marketing promotion covered the category that
+        day. Sourced from the marketing calendar; manually backfilled and
+        unreliable before June 2025.
+    notes: >
+      The category column uses the POS names toast, drinks, and eggs:
+      "drinks" is the POS category that covers coffee and all other
+      beverages, and there is no separate coffee category. An absent
+      (outlet, date) row means the outlet was closed that day or the data
+      is missing; the extract does not distinguish the two.
