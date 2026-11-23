@@ -120,7 +120,10 @@ Cost controls).
 The sandbox is off unless a cohort opts in. Joins are refused while
 `LLM_DAILY_BUDGET_USD` is unset (except on the offline mock provider), stop
 for the rest of the UTC day once the cohort's daily cap or the daily budget
-is reached, and are limited to five seats per network each day. Sandbox
+is reached, and are limited to five seats per network each day (the
+cohort's `sandbox.maxJoinsPerAddressPerDay`, default 5; an optional
+`sandbox.eventWindow` raises it and the cohort's daily budget between two
+dates, for a live demonstration on a shared venue network). Sandbox
 learners are marked `profile_json.kind = "sandbox"` in the `students` table,
 appear as "Sandbox" in the learner list and in the `join_route` column of
 every export, and are left out of analytics by default. Their notice says

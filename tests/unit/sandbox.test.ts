@@ -52,7 +52,7 @@ const { NextRequest } = await import("next/server");
 
 const open = (overrides: Partial<CohortConfig["sandbox"]> = {}): CohortConfig => ({
   ...DEFAULT_COHORT_CONFIG,
-  sandbox: { openJoin: true, maxJoinsPerDay: 50, dailyBudgetUsd: 2, maxLearnerMessages: 40, ...overrides },
+  sandbox: { openJoin: true, maxJoinsPerDay: 50, dailyBudgetUsd: 2, maxLearnerMessages: 40, maxJoinsPerAddressPerDay: 5, eventWindow: null, ...overrides },
 });
 
 const row = (id: string, configJson: unknown, archivedAt: Date | null = null) => ({

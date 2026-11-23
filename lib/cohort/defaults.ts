@@ -90,6 +90,26 @@ export const CohortConfigSchema = z.object({
       // sandbox. The lower of this and limits.maxLearnerMessages applies
       // (lib/cohort/limits.ts).
       maxLearnerMessages: z.number().int().min(1).max(5000).default(40),
+      // Seats one network address may take through the public link per UTC
+      // day (lib/cohort/sandbox.ts), so one visitor clearing cookies cannot
+      // take every seat. Configs stored before this setting existed parse as
+      // 5, the limit that was fixed in code until then.
+      maxJoinsPerAddressPerDay: z.number().int().min(1).max(10000).default(5),
+      // An optional dated window, such as a live demonstration at a venue
+      // where every visitor shares one network, in which its own per-address
+      // limit and daily budget replace the two above
+      // (lib/cohort/sandbox-limits.ts). Times are ISO 8601 with an offset;
+      // the start is inclusive and the end exclusive. Outside the window the
+      // ordinary limits apply again. Null (the default) for no window.
+      eventWindow: z
+        .object({
+          startsAt: z.string().datetime({ offset: true }),
+          endsAt: z.string().datetime({ offset: true }),
+          maxJoinsPerAddressPerDay: z.number().int().min(1).max(10000),
+          dailyBudgetUsd: z.number().min(0).max(10000),
+        })
+        .nullable()
+        .default(null),
     })
     .default({}),
   showcase: z
@@ -209,6 +229,8 @@ export const DEFAULT_COHORT_CONFIG: CohortConfig = {
     maxJoinsPerDay: 50,
     dailyBudgetUsd: 2,
     maxLearnerMessages: 40,
+    maxJoinsPerAddressPerDay: 5,
+    eventWindow: null,
   },
   showcase: {
     comparePair: null,

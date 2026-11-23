@@ -12,9 +12,10 @@
 // budget_refused event.
 //
 // A sandbox cohort (sandbox.openJoin) also has its own daily limit,
-// sandbox.dailyBudgetUsd (default USD 2), counted over that cohort's
-// engagements only, so anonymous visitors cannot use up the budget that the
-// course and showcase cohorts share (checkCohortBudget).
+// sandbox.dailyBudgetUsd (default USD 2; inside the cohort's event window,
+// the window's budget), counted over that cohort's engagements only, so
+// anonymous visitors cannot use up the budget that the course and showcase
+// cohorts share (checkCohortBudget).
 //
 // The spend is cached for SPEND_CACHE_MS so a busy minute costs one pair of
 // aggregate queries rather than one per call. The guard can therefore let
@@ -27,6 +28,7 @@ import { db } from "@/lib/db/client";
 import { engagements, events, messages, rubricScores } from "@/lib/db/schema";
 import { guardPriceFor, isMockModel, readoutPriceFor, tokenCostUsd } from "@/lib/llm/prices";
 import { dailyBudgetUsd } from "@/lib/llm/budget-config";
+import { effectiveSandboxLimits, type SandboxLimitSettings } from "@/lib/cohort/sandbox-limits";
 import { budgetRefusalMessage, nextUtcMidnight, type BudgetAudience, type BudgetRefusalKind } from "@/lib/llm/budget-format";
 
 /** The refusal a learner sees, in UTC; the workspace rewrites it in the
@@ -439,14 +441,16 @@ export function budgetExceededResponse(
 
 export interface CohortBudgetInput {
   id: string;
-  config: { sandbox: { openJoin: boolean; dailyBudgetUsd?: number | null } };
+  config: { sandbox: { openJoin: boolean } & SandboxLimitSettings };
 }
 
-/** The sandbox limit that applies to a cohort, or null for a course cohort
- * (or a sandbox with the limit switched off by setting it to null). */
-export function sandboxLimitUsd(cohort: CohortBudgetInput): number | null {
+/** The sandbox limit that applies to a cohort at `now`, or null for a course
+ * cohort (or a sandbox with the limit switched off by setting it to null).
+ * Inside the cohort's event window the window's budget applies
+ * (lib/cohort/sandbox-limits.ts). */
+export function sandboxLimitUsd(cohort: CohortBudgetInput, now: Date = new Date()): number | null {
   if (!cohort.config.sandbox.openJoin) return null;
-  const v = cohort.config.sandbox.dailyBudgetUsd;
+  const v = effectiveSandboxLimits(cohort.config.sandbox, now).dailyBudgetUsd;
   return typeof v === "number" && Number.isFinite(v) && v >= 0 ? v : null;
 }
 
@@ -482,7 +486,7 @@ export async function checkCohortBudget(
   cohort: CohortBudgetInput,
   deps: BudgetDeps & { fetchCohortTotals?: (cohortId: string, since: Date) => Promise<TokenTotals[]> } = {},
 ): Promise<BudgetCheck> {
-  const limit = sandboxLimitUsd(cohort);
+  const limit = sandboxLimitUsd(cohort, deps.now ?? new Date());
   if (limit !== null) {
     const spend = await cohortSpendTodayUsd(cohort.id, deps);
     if (spend >= limit) {

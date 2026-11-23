@@ -1,10 +1,16 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
+import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { CohortConfig } from "@/lib/cohort/defaults";
+import { eventWindowActive } from "@/lib/cohort/sandbox-limits";
+
+// The event window's times, as the schema stores them: ISO 8601 with an
+// offset, for example 2027-02-15T00:00:00+08:00.
+const isoWithOffset = z.string().datetime({ offset: true });
 
 interface ScenarioOption {
   id: string;
@@ -25,7 +31,7 @@ export interface EffectiveModels {
 // is 0, so committing the parsed value on every keystroke turned a cleared
 // field into a silent 0, which for the audit rate switches consistency
 // auditing off without saying so.
-interface Draft {
+export interface Draft {
   allowed: string[];
   hardGate: boolean;
   minScoreRatio: string;
@@ -40,6 +46,12 @@ interface Draft {
   maxJoinsPerDay: string;
   sandboxBudget: string;
   sandboxMessages: string;
+  joinsPerAddress: string;
+  eventOn: boolean;
+  eventStart: string;
+  eventEnd: string;
+  eventJoinsPerAddress: string;
+  eventBudget: string;
   reviewerVisible: boolean;
 }
 
@@ -51,9 +63,14 @@ type FieldKey =
   | "maxLearnerMessages"
   | "maxJoinsPerDay"
   | "sandboxBudget"
-  | "sandboxMessages";
+  | "sandboxMessages"
+  | "joinsPerAddress"
+  | "eventStart"
+  | "eventEnd"
+  | "eventJoinsPerAddress"
+  | "eventBudget";
 
-function toDraft(config: CohortConfig): Draft {
+export function toDraft(config: CohortConfig): Draft {
   return {
     allowed: config.scenarios.allowed,
     hardGate: config.gates.minScoreRatio !== null,
@@ -72,6 +89,14 @@ function toDraft(config: CohortConfig): Draft {
     maxJoinsPerDay: String(config.sandbox.maxJoinsPerDay),
     sandboxBudget: config.sandbox.dailyBudgetUsd === null ? "" : String(config.sandbox.dailyBudgetUsd),
     sandboxMessages: String(config.sandbox.maxLearnerMessages),
+    joinsPerAddress: String(config.sandbox.maxJoinsPerAddressPerDay),
+    eventOn: config.sandbox.eventWindow !== null,
+    eventStart: config.sandbox.eventWindow?.startsAt ?? "",
+    eventEnd: config.sandbox.eventWindow?.endsAt ?? "",
+    eventJoinsPerAddress: config.sandbox.eventWindow
+      ? String(config.sandbox.eventWindow.maxJoinsPerAddressPerDay)
+      : "",
+    eventBudget: config.sandbox.eventWindow ? String(config.sandbox.eventWindow.dailyBudgetUsd) : "",
     reviewerVisible: config.showcase.reviewerVisible,
   };
 }
@@ -89,7 +114,7 @@ function checkNumber(
   return undefined;
 }
 
-function validate(draft: Draft, acceptsTemperature: boolean): Partial<Record<FieldKey, string>> {
+export function validate(draft: Draft, acceptsTemperature: boolean): Partial<Record<FieldKey, string>> {
   const errors: Partial<Record<FieldKey, string>> = {};
   if (draft.hardGate) {
     const minScore = checkNumber(draft.minScoreRatio, { min: 0, max: 100 });
@@ -115,11 +140,27 @@ function validate(draft: Draft, acceptsTemperature: boolean): Partial<Record<Fie
     }
     const sandboxMessages = checkNumber(draft.sandboxMessages, { min: 1, max: 5000, integer: true });
     if (sandboxMessages) errors.sandboxMessages = sandboxMessages;
+    const perAddress = checkNumber(draft.joinsPerAddress, { min: 1, max: 10000, integer: true });
+    if (perAddress) errors.joinsPerAddress = perAddress;
+    if (draft.eventOn) {
+      const timeError = "Enter a date and time with its offset, such as 2027-02-15T00:00:00+08:00.";
+      const startOk = isoWithOffset.safeParse(draft.eventStart.trim()).success;
+      const endOk = isoWithOffset.safeParse(draft.eventEnd.trim()).success;
+      if (!startOk) errors.eventStart = timeError;
+      if (!endOk) errors.eventEnd = timeError;
+      if (startOk && endOk && Date.parse(draft.eventEnd.trim()) <= Date.parse(draft.eventStart.trim())) {
+        errors.eventEnd = "The end must come after the start.";
+      }
+      const eventJoins = checkNumber(draft.eventJoinsPerAddress, { min: 1, max: 10000, integer: true });
+      if (eventJoins) errors.eventJoinsPerAddress = eventJoins;
+      const eventBudget = checkNumber(draft.eventBudget, { min: 0, max: 10000 });
+      if (eventBudget) errors.eventBudget = eventBudget;
+    }
   }
   return errors;
 }
 
-function toConfig(draft: Draft, stored: CohortConfig): CohortConfig {
+export function toConfig(draft: Draft, stored: CohortConfig): CohortConfig {
   // The retry count is only on screen while the hard gate is on, so a value
   // left unparseable behind a switched-off gate falls back to what is already
   // stored rather than to Number(""), which is 0.
@@ -163,6 +204,22 @@ function toConfig(draft: Draft, stored: CohortConfig): CohortConfig {
       maxLearnerMessages: Number.isFinite(Number(draft.sandboxMessages)) && draft.sandboxMessages.trim() !== ""
         ? Number(draft.sandboxMessages)
         : stored.sandbox.maxLearnerMessages,
+      maxJoinsPerAddressPerDay:
+        draft.joinsPerAddress.trim() !== "" && Number.isInteger(Number(draft.joinsPerAddress))
+          ? Number(draft.joinsPerAddress)
+          : stored.sandbox.maxJoinsPerAddressPerDay,
+      // The window fields are only on screen with open join on; behind a
+      // switched-off sandbox the stored window is kept.
+      eventWindow: !draft.openJoin
+        ? stored.sandbox.eventWindow
+        : draft.eventOn
+          ? {
+              startsAt: draft.eventStart.trim(),
+              endsAt: draft.eventEnd.trim(),
+              maxJoinsPerAddressPerDay: Number(draft.eventJoinsPerAddress),
+              dailyBudgetUsd: Number(draft.eventBudget),
+            }
+          : null,
     },
     // The pinned compare pair is not on the form: it is set with the
     // showcase restore, and a save keeps whatever is stored.
@@ -179,6 +236,11 @@ const FIELD_LABELS: Record<FieldKey, string> = {
   maxJoinsPerDay: "Sandbox joins per day",
   sandboxBudget: "Sandbox daily budget",
   sandboxMessages: "Messages per sandbox engagement",
+  joinsPerAddress: "Sandbox seats per network per day",
+  eventStart: "Event window start",
+  eventEnd: "Event window end",
+  eventJoinsPerAddress: "Event seats per network per day",
+  eventBudget: "Event daily budget",
 };
 
 function NumberField({
@@ -222,6 +284,52 @@ function NumberField({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
         className={error ? "mt-1.5 w-32 border-flag" : "mt-1.5 w-32"}
+      />
+      {error ? (
+        <span id={`${id}-error`} role="alert" className="mt-1 block text-xs text-flag">
+          {error}
+        </span>
+      ) : null}
+      {hint ? (
+        <span id={`${id}-hint`} className="mt-1 block text-xs text-muted-foreground">
+          {hint}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+function TextField({
+  id,
+  label,
+  hint,
+  value,
+  onChange,
+  placeholder,
+  error,
+}: {
+  id: FieldKey;
+  label: string;
+  hint?: ReactNode;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  error?: string;
+}) {
+  return (
+    <div className="max-w-sm text-sm">
+      <label htmlFor={id} className="block">
+        {label}
+      </label>
+      <Input
+        id={id}
+        type="text"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+        className={error ? "mt-1.5 w-64 border-flag font-mono" : "mt-1.5 w-64 font-mono"}
       />
       {error ? (
         <span id={`${id}-error`} role="alert" className="mt-1 block text-xs text-flag">
@@ -578,6 +686,92 @@ export function CohortConfigForm({
               error={errors.sandboxMessages}
               hint="Applies to seats that joined through the public link; the lower of this and the cohort's message limit is used."
             />
+            <NumberField
+              id="joinsPerAddress"
+              label="Sandbox seats per network per day (UTC)"
+              value={draft.joinsPerAddress}
+              onChange={(v) => update({ joinsPerAddress: v })}
+              min={1}
+              max={10000}
+              step={1}
+              error={errors.joinsPerAddress}
+              hint="Seats one network address may take through the public link each UTC day, so one visitor clearing cookies cannot take every seat. Visitors behind one shared network (a venue's Wi-Fi) share this limit. The landing page states it."
+            />
+          </div>
+        ) : null}
+        {draft.openJoin ? (
+          <div className="mt-5">
+            <label className="flex items-center gap-2.5 text-sm">
+              <input
+                type="checkbox"
+                checked={draft.eventOn}
+                onChange={(e) => update({ eventOn: e.target.checked })}
+                className="h-4 w-4 rounded border"
+              />
+              Event window: raise the per-network limit and the daily budget between two dates
+            </label>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              For a live demonstration, where every visitor shares the venue&apos;s network. Inside
+              the window (start included, end excluded) its two limits replace the ordinary ones;
+              before and after it the ordinary limits apply, with no further change needed. Give
+              times in the venue&apos;s local time with its offset. Seats and spend are still
+              counted per UTC day, and the deployment&apos;s own daily budget still caps the total.
+            </p>
+            {draft.eventOn ? (
+              <>
+                {eventWindowActive(
+                  {
+                    startsAt: draft.eventStart.trim(),
+                    endsAt: draft.eventEnd.trim(),
+                    maxJoinsPerAddressPerDay: 1,
+                    dailyBudgetUsd: 0,
+                  },
+                  new Date(),
+                ) ? (
+                  <p role="status" className="mt-2 text-xs font-medium text-primary">
+                    The window is in force now.
+                  </p>
+                ) : null}
+                <div className="mt-3 flex flex-wrap gap-4">
+                  <TextField
+                    id="eventStart"
+                    label="Starts"
+                    value={draft.eventStart}
+                    onChange={(v) => update({ eventStart: v })}
+                    placeholder="2027-02-15T00:00:00+08:00"
+                    error={errors.eventStart}
+                  />
+                  <TextField
+                    id="eventEnd"
+                    label="Ends (not included)"
+                    value={draft.eventEnd}
+                    onChange={(v) => update({ eventEnd: v })}
+                    placeholder="2027-02-20T00:00:00+08:00"
+                    error={errors.eventEnd}
+                  />
+                  <NumberField
+                    id="eventJoinsPerAddress"
+                    label="Seats per network per day in the window"
+                    value={draft.eventJoinsPerAddress}
+                    onChange={(v) => update({ eventJoinsPerAddress: v })}
+                    min={1}
+                    max={10000}
+                    step={1}
+                    error={errors.eventJoinsPerAddress}
+                  />
+                  <NumberField
+                    id="eventBudget"
+                    label="Sandbox daily budget in the window (USD)"
+                    value={draft.eventBudget}
+                    onChange={(v) => update({ eventBudget: v })}
+                    min={0}
+                    max={10000}
+                    step={0.5}
+                    error={errors.eventBudget}
+                  />
+                </div>
+              </>
+            ) : null}
           </div>
         ) : null}
       </fieldset>

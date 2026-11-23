@@ -1,6 +1,6 @@
 {
   "name": "agenticpracticum",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Multi-agent LLM platform that simulates clients, data environments, and end-users so learners practise the end-to-end data-science engagement.",
   "license": "MIT",

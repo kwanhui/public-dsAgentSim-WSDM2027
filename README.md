@@ -46,7 +46,12 @@ network each day and 40 messages per seat, within a capped daily budget for
 the sandbox cohort. The code default for that budget is USD 2 a day. Since
 2026-10-20 the hosted sandbox cohort has been set to USD 8 a day in its
 stored configuration, because a thorough seat costs about USD 0.6 to 0.8 and
-USD 2 covered only two or three of them a day.
+USD 2 covered only two or three of them a day. The per-network seat limit
+and the daily budget are settings of the sandbox cohort
+(`sandbox.maxJoinsPerAddressPerDay`, default 5, and `sandbox.dailyBudgetUsd`),
+and an optional dated event window (`sandbox.eventWindow`) raises both for a
+live demonstration and lets them fall back when it ends; all are on the
+cohort's Configuration page.
 
 The hosted demo is built from the main branch of this repository.
 Its `/api/health` endpoint reports the commit that the live demo runs in the
@@ -157,6 +162,7 @@ These are optional:
 | `AUTH_URL` | public origin; leave unset unless a proxy rewrites the host |
 | `AUTH_TRUST_HOST` | `true` when you serve `pnpm start` yourself outside Vercel (Vercel sets the equivalent itself) |
 | `NEXT_PUBLIC_PAPER_URL`, `NEXT_PUBLIC_VIDEO_URL` | optional links on the landing page |
+| `NEXT_PUBLIC_SOURCE_URL` | optional; the landing page's source-code link (default: this public repository) |
 
 `DB_DRIVER=pglite` (with `PGLITE_DIR`) swaps Postgres for the embedded
 database and is meant for local use. Never set `DEMO_MODE` outside the demo

@@ -24,7 +24,7 @@ describe("cohort config defaults", () => {
   });
 
   it("closes the sandbox and caps learner messages by default", () => {
-    expect(DEFAULT_COHORT_CONFIG.sandbox).toEqual({ openJoin: false, maxJoinsPerDay: 50, dailyBudgetUsd: 2, maxLearnerMessages: 40 });
+    expect(DEFAULT_COHORT_CONFIG.sandbox).toEqual({ openJoin: false, maxJoinsPerDay: 50, dailyBudgetUsd: 2, maxLearnerMessages: 40, maxJoinsPerAddressPerDay: 5, eventWindow: null });
     expect(DEFAULT_COHORT_CONFIG.limits.maxLearnerMessages).toBe(200);
   });
 
@@ -52,7 +52,7 @@ describe("parseCohortConfig on a config saved before the new keys", () => {
   it("fills keys the stored config lacks from the defaults", () => {
     expect(parsed.research.reflections).toBe(false);
     expect(parsed.limits).toEqual({ maxLearnerMessages: 200 });
-    expect(parsed.sandbox).toEqual({ openJoin: false, maxJoinsPerDay: 50, dailyBudgetUsd: 2, maxLearnerMessages: 40 });
+    expect(parsed.sandbox).toEqual({ openJoin: false, maxJoinsPerDay: 50, dailyBudgetUsd: 2, maxLearnerMessages: 40, maxJoinsPerAddressPerDay: 5, eventWindow: null });
     expect(parsed.showcase).toEqual({ comparePair: null, reviewerVisible: false, labels: {}, scriptedReplays: [], h1Patch: null });
   });
 

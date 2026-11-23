@@ -15,8 +15,9 @@
 // spend budget must be set (lib/llm/budget.ts; the offline mock provider
 // costs nothing and is exempt); the budget must not be spent; the cohort's
 // sandbox.maxJoinsPerDay (UTC day) must not be reached; and one address may
-// take at most SANDBOX_JOINS_PER_IP_PER_DAY seats a day (one visitor
-// clearing cookies could otherwise take every seat).
+// take at most the cohort's sandbox.maxJoinsPerAddressPerDay seats a day (one
+// visitor clearing cookies could otherwise take every seat), or the event
+// window's limit while one is in force (lib/cohort/sandbox-limits.ts).
 
 import { createHmac } from "node:crypto";
 import { and, desc, eq, gte, isNull, sql } from "drizzle-orm";
@@ -25,6 +26,7 @@ import { cohorts, students } from "@/lib/db/schema";
 import { parseCohortConfig, type CohortConfig } from "@/lib/cohort/defaults";
 import { createPseudonymousStudent, createStudentSession, requirePseudonymSalt, type StudentSession } from "@/lib/cohort/invite";
 import { utcDayStart } from "@/lib/llm/budget";
+import { DEFAULT_JOINS_PER_ADDRESS_PER_DAY, effectiveSandboxLimits } from "@/lib/cohort/sandbox-limits";
 
 // Marks learners created through the sandbox, for the daily count and so
 // instructors can tell them from invited learners in exports.
@@ -127,8 +129,10 @@ export async function countSandboxJoinsToday(cohortId: string, now: Date = new D
   return Number(row?.n ?? 0);
 }
 
-/** Seats one address may take per UTC day, across all cohorts. */
-export const SANDBOX_JOINS_PER_IP_PER_DAY = 5;
+/** The default number of seats one address may take per UTC day, counted
+ * across all cohorts. Each cohort sets its own limit in
+ * sandbox.maxJoinsPerAddressPerDay; this is the schema default. */
+export const SANDBOX_JOINS_PER_IP_PER_DAY = DEFAULT_JOINS_PER_ADDRESS_PER_DAY;
 
 export type SandboxRefusal = "sandbox-closed" | "sandbox-no-budget" | "sandbox-full" | "sandbox-ip-limit" | "usage-limit";
 
@@ -140,12 +144,14 @@ export function sandboxJoinRefusal(input: {
   budgetSet?: boolean;
   joinsToday: number;
   joinsFromAddressToday?: number;
+  now?: Date;
 }): SandboxRefusal | null {
   if (!input.cohort || !input.cohort.config.sandbox.openJoin) return "sandbox-closed";
   if (input.budgetSet === false) return "sandbox-no-budget";
   if (!input.budgetOk) return "usage-limit";
   if (input.joinsToday >= input.cohort.config.sandbox.maxJoinsPerDay) return "sandbox-full";
-  if ((input.joinsFromAddressToday ?? 0) >= SANDBOX_JOINS_PER_IP_PER_DAY) return "sandbox-ip-limit";
+  const { maxJoinsPerAddressPerDay } = effectiveSandboxLimits(input.cohort.config.sandbox, input.now);
+  if ((input.joinsFromAddressToday ?? 0) >= maxJoinsPerAddressPerDay) return "sandbox-ip-limit";
   return null;
 }
 

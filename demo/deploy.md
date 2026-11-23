@@ -109,6 +109,15 @@ from this repository's main branch, and check that its commit matches a
   stays USD 2; only the hosted deployment overrides it. The other sandbox
   limits are unchanged: 40 messages per seat and five seats per network per
   UTC day.
+- Live demonstrations: visitors at a venue share one network, so five seats
+  per network a day would serve the whole booth. The sandbox cohort's
+  Configuration page sets the per-network limit
+  (`sandbox.maxJoinsPerAddressPerDay`) and an optional event window
+  (`sandbox.eventWindow`: start and end as ISO 8601 with the venue's offset,
+  end excluded, with the per-network limit and sandbox daily budget that
+  apply inside it). Outside the window the ordinary limits apply again, with
+  no further change. Raise `LLM_DAILY_BUDGET_USD` on the deployment for the
+  same days if the window's budget would not fit under it.
 - Spend per cohort and per engagement, computed by the same code as the
   guard (`lib/llm/budget.ts`), is shown to the instructor on the cohort
   overview, the engagement monitor and the compare view, and is in the

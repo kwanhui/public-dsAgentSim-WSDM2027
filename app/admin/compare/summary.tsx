@@ -50,6 +50,7 @@ export function HeldConstant({ left, right }: { left: SideData; right: SideData 
             .join(" · ")}
         </p>
       ) : null}
+      {left.isAgent || right.isAgent ? <ModeNote /> : null}
       {unrecorded.length > 0 ? (
         <p className="text-muted-foreground">
           <span className="font-medium text-foreground">Not recorded:</span>{" "}
@@ -62,6 +63,21 @@ export function HeldConstant({ left, right }: { left: SideData; right: SideData 
         </p>
       ) : null}
     </div>
+  );
+}
+
+// What differs between an analyst-agent run and a learner's run by design,
+// whatever the settings above: what the agent can see and do, and the one
+// scoring rule that applies to agent runs only (UNVERIFIED_CLAIM_CAP_RATIO
+// in lib/agents/prompt-provenance.ts, applied in lib/agents/rubric.ts).
+export const MODE_NOTE =
+  "The analyst agent sees profiles of the released files (row counts, missing values, ranges, means and most frequent values) and the chat, and does no computation on the data; a learner works on the files themselves. The cap on a criterion that rests on an unverified result (2 of 5 points) applies only to agent runs; a learner's flagged criterion keeps the judge's score and is shown to the instructor.";
+
+function ModeNote() {
+  return (
+    <p className="text-muted-foreground">
+      <span className="font-medium text-foreground">Mode differences:</span> {MODE_NOTE}
+    </p>
   );
 }
 

@@ -2,8 +2,9 @@ cff-version: 1.2.0
 message: "If you use this software, please cite the companion paper."
 title: "AgenticPracticum: A Multi-Agent LLM Testbed for Practising End-to-End Data-Science Engagements"
 type: software
-version: 0.1.0
-date-released: "2026-11-22"
+version: 0.2.0
+date-released: "2026-11-23"
+commit: "deployed-2026-11-23"
 authors:
   - family-names: Lim
     given-names: Kwan Hui

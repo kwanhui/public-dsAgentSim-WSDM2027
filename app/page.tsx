@@ -1,7 +1,9 @@
 import { Briefcase, Database, UserRound } from "lucide-react";
 import Link from "next/link";
 import { StageStrip } from "@/components/ui/stage-strip";
-import { findOpenJoinCohort, SANDBOX_JOINS_PER_IP_PER_DAY } from "@/lib/cohort/sandbox";
+import { findOpenJoinCohort } from "@/lib/cohort/sandbox";
+import { effectiveSandboxLimits } from "@/lib/cohort/sandbox-limits";
+import { sandboxLine } from "@/lib/landing-copy";
 import { externalLinks } from "@/lib/landing-links";
 import { listScenarios } from "@/lib/scenarios/load";
 import { STAGE_IDS, STAGE_TITLES } from "@/lib/scenarios/types";
@@ -13,26 +15,21 @@ export const dynamic = "force-dynamic";
 // The configured sandbox cohort's own /try/<slug> link, so the link names
 // its cohort and does not move when another cohort opens (lib/cohort/sandbox),
 // and the scenarios that cohort offers, so the line names what a visitor gets.
-async function sandboxLink(): Promise<{ href: string; scenarios: string[] } | null> {
+async function sandboxLink(): Promise<{ href: string; scenarios: string[]; seatsPerAddress: number } | null> {
   try {
     const cohort = await findOpenJoinCohort();
     if (!cohort) return null;
     const allowed = cohort.config.scenarios.allowed;
     const titles = (await listScenarios()).filter((s) => allowed.includes(s.id)).map((s) => s.title);
-    return { href: `/try/${encodeURIComponent(cohort.slug)}`, scenarios: titles };
+    return {
+      href: `/try/${encodeURIComponent(cohort.slug)}`,
+      scenarios: titles,
+      seatsPerAddress: effectiveSandboxLimits(cohort.config.sandbox).maxJoinsPerAddressPerDay,
+    };
   } catch {
     // An unreachable database hides the link rather than breaking the page.
     return null;
   }
-}
-
-// The seat limit is the one the join route applies (per network, per UTC day).
-const NO_INVITE = `No invite needed; up to ${SANDBOX_JOINS_PER_IP_PER_DAY} seats per network each day.`;
-
-function sandboxLine(scenarios: string[]): string {
-  if (scenarios.length === 1) return `: opens a sandbox seat in one scenario, ${scenarios[0]}. ${NO_INVITE}`;
-  if (scenarios.length > 1) return `: opens a sandbox seat where you choose one of ${scenarios.length} scenarios. ${NO_INVITE}`;
-  return `: opens a sandbox seat. ${NO_INVITE}`;
 }
 
 const roles = [
@@ -63,7 +60,7 @@ export default async function Home() {
             <a href={trySandbox.href} rel="nofollow" className="font-medium text-primary underline-offset-4 hover:underline">
               Try as a learner
             </a>
-            <span className="text-muted-foreground">{sandboxLine(trySandbox.scenarios)}</span>
+            <span className="text-muted-foreground">{sandboxLine(trySandbox.scenarios, trySandbox.seatsPerAddress)}</span>
           </li>
         ) : null}
         <li>
