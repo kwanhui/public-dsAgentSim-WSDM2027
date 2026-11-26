@@ -2,7 +2,7 @@
 
 > **Status:** public snapshot of the system accepted to the WSDM 2027 Demonstrations Track (notified 2026-11-22).
 >
-> **Demonstration video:** <https://youtu.be/vfHl-Ba-PZI> (2:48).
+> **Demonstration video:** <https://youtu.be/BOIjjLqMd_w> (2:48).
 >
 > **Hosted demo:** <https://agenticpracticum.vercel.app>, read-only reviewer sign-in `reviewer` / `wsdm2027-demo`.
 
@@ -29,7 +29,7 @@ Testbed for Practising End-to-End Data-Science Engagements", by Kwan Hui Lim,
 Carmen Kar Hang Lee, Vanessa Liu and Yongqing Zhu, which has been accepted to
 the WSDM 2027 Demonstrations Track. The source code is at
 [`public-dsAgentSim-WSDM2027`](https://github.com/kwanhui/public-dsAgentSim-WSDM2027),
-and the demo video is at <https://youtu.be/vfHl-Ba-PZI>.
+and the demo video is at <https://youtu.be/BOIjjLqMd_w>.
 
 ## Hosted demo
 
